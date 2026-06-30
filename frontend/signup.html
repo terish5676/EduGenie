@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account | EduGenie</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="/static/css/design-system.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    body {
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh;
+    }
+    
+    .auth-wrapper {
+      width: 100%; max-width: 440px; padding: var(--space-xl);
+    }
+    
+    .auth-header { text-align: center; margin-bottom: var(--space-xl); }
+    .auth-logo { width: 48px; height: 48px; margin: 0 auto var(--space-md); }
+    
+    .auth-card { padding: var(--space-2xl); }
+    
+    .auth-footer { text-align: center; margin-top: var(--space-lg); }
+    
+    .error-msg {
+      color: #EF4444; font-size: 0.875rem; margin-bottom: var(--space-md);
+      display: none; text-align: center; font-weight: 500;
+      background: #FEF2F2; padding: 12px; border-radius: var(--radius-sm); border: 1px solid #FECACA;
+    }
+    .error-msg.show { display: block; }
+  </style>
+</head>
+<body data-page="signup">
+
+  <div class="ambient-bg"></div>
+
+  <div class="auth-wrapper">
+    <div class="auth-header">
+      <img src="/static/assets/logo.svg" alt="EduGenie Logo" class="auth-logo">
+      <h1 class="text-h2">Create an account.</h1>
+      <p class="text-body" style="margin-top: 8px;">Start your personalized learning journey today.</p>
+    </div>
+    
+    <div class="card auth-card">
+      <div id="signup-error" class="error-msg"></div>
+
+      <form id="signup-form">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" id="signup-name" class="form-input" placeholder="Jane Doe" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input type="email" id="signup-email" class="form-input" placeholder="name@school.edu" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" id="signup-password" class="form-input" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn btn-primary" id="signup-submit" style="width: 100%; margin-top: var(--space-sm);">
+          Create Account
+        </button>
+      </form>
+    </div>
+    
+    <div class="auth-footer text-sm">
+      Already have an account? <a href="/login" style="font-weight: 600;">Sign in</a>
+    </div>
+  </div>
+
+  <script type="module" src="/static/js/auth.js"></script>
+</body>
+</html>

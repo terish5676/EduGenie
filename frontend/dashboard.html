@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Workspace | EduGenie</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="/static/css/design-system.css">
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <style>
+    body {
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      background-color: var(--surface-alt);
+    }
+
+    /* ==========================================================================
+       SIDEBAR
+       ========================================================================== */
+    .sidebar {
+      width: 280px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      z-index: 10;
+    }
+
+    .sidebar-header {
+      padding: var(--space-xl);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+    .sidebar-logo { width: 32px; height: 32px; }
+    .sidebar-brand { font-size: 1.25rem; font-weight: 700; color: var(--text-main); letter-spacing: -0.02em; }
+
+    .sidebar-nav {
+      padding: 0 var(--space-md);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+
+    .nav-label {
+      font-size: 0.75rem; font-weight: 700; color: var(--text-tertiary);
+      text-transform: uppercase; letter-spacing: 0.05em; margin: var(--space-lg) var(--space-md) var(--space-sm);
+    }
+
+    .nav-item {
+      display: flex; align-items: center; gap: var(--space-md);
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--radius-md);
+      color: var(--text-sec);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.95rem;
+      transition: all var(--duration-fast) var(--ease-fluid);
+    }
+    .nav-item i { width: 18px; height: 18px; transition: transform var(--duration-fast) var(--ease-spring); }
+    .nav-item:hover { background: var(--bg); color: var(--text-main); }
+    .nav-item:hover i { transform: scale(1.1); color: var(--primary); }
+    
+    .nav-item.active { background: var(--primary-soft); color: var(--primary); font-weight: 600; }
+    
+    .sidebar-footer { padding: var(--space-lg); border-top: 1px solid var(--border); }
+    .logout-btn {
+      width: 100%; display: flex; align-items: center; justify-content: center; gap: var(--space-sm);
+      padding: var(--space-sm) var(--space-md); border-radius: var(--radius-md);
+      background: transparent; color: var(--text-sec); border: none;
+      font-weight: 500; cursor: pointer; transition: all var(--duration-fast) var(--ease-fluid);
+    }
+    .logout-btn:hover { background: #FEF2F2; color: #EF4444; }
+
+    /* ==========================================================================
+       MAIN DASHBOARD
+       ========================================================================== */
+    .main-workspace {
+      flex: 1; display: flex; flex-direction: column; position: relative; overflow-y: auto;
+    }
+
+    .topbar {
+      height: 80px; padding: 0 var(--space-2xl);
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 20;
+      background: rgba(241, 245, 249, 0.8); backdrop-filter: blur(12px);
+    }
+    
+    .greeting { font-size: 1.5rem; font-weight: 700; color: var(--text-main); letter-spacing: -0.02em; }
+    
+    .topbar-actions { display: flex; align-items: center; gap: var(--space-md); }
+    .icon-btn {
+      width: 40px; height: 40px; border-radius: var(--radius-full);
+      background: var(--surface); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-sec); cursor: pointer; transition: all var(--duration-fast) var(--ease-spring);
+      box-shadow: var(--shadow-sm);
+    }
+    .icon-btn:hover { color: var(--primary); box-shadow: var(--shadow-md); transform: translateY(-2px); }
+
+    .dash-content { padding: var(--space-xl) var(--space-2xl) var(--space-5xl); max-width: 1200px; margin: 0 auto; width: 100%; }
+
+    /* Stats Row */
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-lg); margin-bottom: var(--space-2xl); }
+    .stat-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-xl);
+      padding: var(--space-lg); box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: var(--space-xs);
+    }
+    .stat-label { font-size: 0.85rem; font-weight: 600; color: var(--text-sec); text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 8px; }
+    .stat-value { font-size: 2.5rem; font-weight: 700; color: var(--text-main); letter-spacing: -0.03em; }
+
+    /* Quick AI Actions Grid */
+    .section-title { font-size: 1.25rem; font-weight: 700; margin-bottom: var(--space-lg); letter-spacing: -0.01em; }
+    
+    .ai-actions-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--space-md); margin-bottom: var(--space-3xl); }
+    
+    .ai-tool-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-xl);
+      padding: var(--space-lg) var(--space-md); text-align: center; cursor: pointer;
+      box-shadow: var(--shadow-sm); transition: all var(--duration-normal) var(--ease-spring);
+      position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center;
+    }
+    .ai-tool-card::before {
+      content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background: radial-gradient(circle at 50% 0%, var(--primary-soft), transparent 60%);
+      opacity: 0; transition: opacity var(--duration-fast); pointer-events: none;
+    }
+    .ai-tool-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: var(--border-hover); }
+    .ai-tool-card:hover::before { opacity: 1; }
+    .ai-tool-card.active { border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-soft); }
+
+    .ai-tool-icon {
+      width: 48px; height: 48px; border-radius: var(--radius-lg); margin-bottom: var(--space-md);
+      display: flex; align-items: center; justify-content: center;
+      background: var(--bg); color: var(--primary); transition: transform var(--duration-normal) var(--ease-spring);
+    }
+    .ai-tool-card:hover .ai-tool-icon { transform: scale(1.1); background: var(--primary-soft); }
+    .ai-tool-card.active .ai-tool-icon { background: var(--primary); color: white; }
+
+    .ai-tool-title { font-weight: 600; font-size: 0.95rem; margin-bottom: 4px; color: var(--text-main); }
+    .ai-tool-desc { font-size: 0.8rem; color: var(--text-sec); line-height: 1.4; }
+
+    /* AI Tool Workspace (The main input area) */
+    .tool-workspace {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-lg); overflow: hidden; display: flex; flex-direction: column;
+    }
+    .workspace-header {
+      padding: var(--space-lg) var(--space-xl); border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center; background: var(--bg);
+    }
+    .workspace-title { font-size: 1.1rem; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+    .workspace-title i { color: var(--primary); }
+
+    .workspace-body { padding: var(--space-xl); }
+    
+    .tool-textarea {
+      width: 100%; min-height: 150px; padding: var(--space-lg);
+      background: var(--surface-alt); border: 1px solid var(--border); border-radius: var(--radius-lg);
+      font-family: var(--font-sans); font-size: 1rem; color: var(--text-main);
+      resize: vertical; outline: none; transition: all var(--duration-fast) var(--ease-fluid);
+      margin-bottom: var(--space-lg); box-shadow: var(--shadow-inner);
+    }
+    .tool-textarea:focus { background: var(--surface); border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-soft); }
+
+    /* Drop zone */
+    .file-drop-zone {
+      border: 2px dashed var(--border); border-radius: var(--radius-lg); padding: var(--space-xl);
+      text-align: center; cursor: pointer; margin-bottom: var(--space-lg); transition: all var(--duration-fast);
+      background: var(--surface-alt);
+    }
+    .file-drop-zone:hover { border-color: var(--primary); background: var(--primary-soft); }
+
+    .workspace-actions { display: flex; justify-content: flex-end; gap: var(--space-md); }
+
+    /* Response Area */
+    .response-area { display: none; border-top: 1px solid var(--border); background: var(--bg); }
+    .response-area.show { display: block; animation: fadeIn 0.4s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .response-header { padding: var(--space-lg) var(--space-xl); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
+    .response-title { font-size: 1rem; font-weight: 600; display: flex; align-items: center; gap: 8px; color: var(--primary); }
+    .response-body { padding: var(--space-xl); font-size: 1rem; line-height: 1.8; color: var(--text-main); }
+    
+    @keyframes generatingZoom {
+      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(91, 141, 255, 0.4); }
+      50% { transform: scale(1.02); box-shadow: 0 0 0 12px rgba(91, 141, 255, 0); }
+      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(91, 141, 255, 0); }
+    }
+    .generating-zoom {
+      animation: generatingZoom 1.5s infinite ease-in-out;
+      pointer-events: none;
+      opacity: 0.9;
+    }
+    
+    @media print {
+      .sidebar, .topbar, .stats-grid, .ai-actions-grid, .section-title, #file-drop-zone, .tool-textarea, #generate-btn { display: none !important; }
+      .workspace-header, .response-header { display: none !important; }
+      .explain-content + div { display: none !important; } /* right sidebar */
+      .explain-content { box-shadow: none !important; border: none !important; padding: 0 !important; }
+      .main-workspace { padding: 0 !important; overflow: visible !important; }
+      .tool-workspace { box-shadow: none !important; border: none !important; }
+      body { background: white; color: black; overflow: visible !important; }
+      h1, h2, h3 { page-break-after: avoid; }
+    }
+    
+  </style>
+</head>
+<body>
+
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <img src="/static/assets/logo.svg" alt="EduGenie Logo" class="sidebar-logo">
+      <span class="sidebar-brand">EduGenie</span>
+    </div>
+    
+    <nav class="sidebar-nav">
+      <div class="nav-label">Main Menu</div>
+      <a class="nav-item active" href="/dashboard">
+        <i data-lucide="layout-dashboard"></i> Workspace
+      </a>
+      <a class="nav-item" href="/notes">
+        <i data-lucide="file-text"></i> Library
+      </a>
+      <a class="nav-item" href="/bookmarks">
+        <i data-lucide="bookmark"></i> Bookmarks
+      </a>
+      
+      <div class="nav-label">Analytics</div>
+      <a class="nav-item" href="/progress"><i data-lucide="activity"></i> Progress</a>
+      <a class="nav-item" href="/history"><i data-lucide="clock"></i> History</a>
+      <a class="nav-item" href="/achievements"><i data-lucide="award"></i> Achievements</a>
+      
+      <div style="flex:1;"></div>
+      <!-- Weekly Streak in Sidebar -->
+      <div style="padding:var(--space-lg) var(--space-md); text-align:center;">
+        <div style="background:var(--surface-alt); border-radius:var(--radius-xl); padding:var(--space-md); border:1px solid var(--border);">
+          <div style="font-size:0.85rem; font-weight:700; color:var(--text-main); margin-bottom:12px; display:flex; align-items:center; justify-content:center; gap:6px;">
+            <i data-lucide="flame" style="color:#F97316; width:16px;"></i> Weekly Streak
+          </div>
+          <div id="sidebar-weekly-streak" style="display:flex; justify-content:space-between; gap:4px;">
+            <!-- Rendered by JS -->
+          </div>
+          <div id="sidebar-streak-text" style="font-size:0.75rem; color:var(--text-sec); margin-top:12px; font-weight:500;">You're on a <span style="color:#F97316; font-weight:700;">0-day</span> streak!</div>
+        </div>
+      </div>
+    </nav>
+    
+    <div class="sidebar-footer">
+      <button class="logout-btn" id="logout-btn"><i data-lucide="log-out"></i> Sign Out</button>
+    </div>
+  </div>
+
+  <main class="main-workspace">
+    <header class="topbar">
+      <div>
+        <div class="greeting" data-greeting>Good Afternoon, Scholar <i data-lucide="hand" style="width:20px; color:#F59E0B; margin-left:4px;"></i></div>
+        <div style="color:var(--text-sec); font-size: 0.95rem; margin-top: 4px;">Let's make today a productive learning day!</div>
+      </div>
+      <div class="topbar-actions">
+        <div style="position:relative; display:flex; align-items:center;">
+          <i data-lucide="search" style="position:absolute; left:12px; width:16px; color:var(--text-tertiary);"></i>
+          <input type="text" id="dash-search-input" placeholder="Search anything... (Ctrl+K)" style="width:260px; padding:10px 40px 10px 36px; border-radius:var(--radius-full); border:1px solid var(--border); background:var(--surface); font-size:0.9rem; outline:none; transition: all 0.2s; box-shadow: 0 0 0 2px transparent;" onfocus="this.style.boxShadow='0 0 0 2px var(--primary-soft)';" onblur="this.style.boxShadow='0 0 0 2px transparent';">
+        </div>
+        <!-- Notification Bell -->
+        <div style="position:relative;">
+          <button class="icon-btn" id="notif-btn" title="Notifications" style="position:relative;">
+            <i data-lucide="bell"></i>
+            <span id="notif-badge" style="position:absolute; top:8px; right:10px; width:8px; height:8px; background:#EF4444; border-radius:50%; border:2px solid var(--surface); display:none;"></span>
+          </button>
+          <!-- Notification Panel -->
+          <div id="notif-panel" style="display:none; position:absolute; top:calc(100% + 10px); right:0; width:340px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-xl); box-shadow:var(--shadow-lg); z-index:200; overflow:hidden;">
+            <div style="padding:16px 20px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+              <div style="font-weight:700; font-size:1rem; color:var(--text-main); display:flex; align-items:center; gap:8px;"><i data-lucide="bell" style="width:16px; color:var(--primary);"></i> Notifications</div>
+              <button onclick="clearNotifications()" style="font-size:0.8rem; color:var(--primary); background:none; border:none; cursor:pointer; font-weight:600;">Clear all</button>
+            </div>
+            <div id="notif-list" style="max-height:320px; overflow-y:auto; padding:8px 0;">
+              <div style="padding:24px; text-align:center; color:var(--text-sec); font-size:0.9rem;">
+                <i data-lucide="bell-off" style="width:32px; height:32px; margin-bottom:8px; display:block; margin:0 auto 8px;"></i>
+                No notifications yet
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="icon-btn" id="profile-btn" title="Profile" style="background:var(--primary); color:white; font-weight:700; border:none;" onclick="window.location.href='/settings'" data-user-initials>S</button>
+      </div>
+    </header>
+
+    <div class="dash-content">
+      
+      <div class="stats-grid gsap-up">
+        <!-- Streak -->
+        <div class="stat-card" style="flex-direction:row; justify-content:space-between; align-items:center;">
+          <div>
+            <div class="stat-label"><i data-lucide="flame" style="color:#F97316;width:16px;"></i> STUDY STREAK</div>
+            <div style="display:flex; align-items:baseline; gap:8px;">
+              <div class="stat-value" id="stat-streak">12</div>
+              <span style="font-weight:600; color:var(--text-main);">days</span>
+            </div>
+            <div style="font-size:0.8rem; color:var(--text-sec); margin-top:4px; display:flex; align-items:center; gap:4px;">Keep it up! <i data-lucide="flame" style="width:12px; color:#F97316;"></i></div>
+          </div>
+          <div style="width:60px; height:60px; border-radius:50%; border:4px solid #F97316; border-left-color:transparent; transform:rotate(-45deg); display:flex; align-items:center; justify-content:center;">
+            <i data-lucide="flame" style="color:#F97316; transform:rotate(45deg);"></i>
+          </div>
+        </div>
+        <!-- Focus -->
+        <div class="stat-card" style="flex-direction:row; justify-content:space-between; align-items:center;">
+          <div>
+            <div class="stat-label"><i data-lucide="target" style="color:#3B82F6;width:16px;"></i> FOCUS SCORE</div>
+            <div class="stat-value" id="stat-focus" style="color:var(--text-main);">72%</div>
+            <div style="font-size:0.8rem; color:var(--text-sec); margin-top:4px; display:flex; align-items:center; gap:4px;">Good Focus <i data-lucide="check-circle" style="width:12px; color:#10B981;"></i></div>
+          </div>
+          <div style="width:60px; height:60px; border-radius:50%; border:4px solid #3B82F6; border-bottom-color:transparent; transform:rotate(20deg); display:flex; align-items:center; justify-content:center;">
+            <i data-lucide="sparkles" style="color:#3B82F6; transform:rotate(-20deg);"></i>
+          </div>
+        </div>
+        <!-- Sessions -->
+        <div class="stat-card" style="flex-direction:row; justify-content:space-between; align-items:center;">
+          <div>
+            <div class="stat-label"><i data-lucide="layers" style="color:#8B5CF6;width:16px;"></i> SESSIONS</div>
+            <div class="stat-value" id="stat-sessions">8</div>
+            <div style="font-size:0.8rem; color:var(--text-sec); margin-top:4px; display:flex; align-items:center; gap:4px;">This Week <i data-lucide="calendar" style="width:12px; color:var(--text-sec);"></i></div>
+          </div>
+          <div style="width:60px; height:60px; border-radius:50%; border:4px solid #8B5CF6; border-right-color:transparent; transform:rotate(45deg); display:flex; align-items:center; justify-content:center;">
+            <i data-lucide="trending-up" style="color:#8B5CF6; transform:rotate(-45deg);"></i>
+          </div>
+        </div>
+        <!-- Weekly Goal -->
+        <div class="stat-card" style="flex-direction:row; justify-content:space-between; align-items:center;">
+          <div>
+            <div class="stat-label"><i data-lucide="check-circle-2" style="color:#10B981;width:16px;"></i> WEEKLY GOAL</div>
+            <div class="stat-value" id="stat-goal">12 <span style="font-size:1.2rem; color:var(--text-sec);">/ 20</span></div>
+            <div style="font-size:0.8rem; color:var(--text-sec); margin-top:4px; display:flex; align-items:center; gap:4px;">Sessions <i data-lucide="award" style="width:12px; color:#10B981;"></i></div>
+          </div>
+          <div style="width:60px; height:60px; border-radius:50%; border:4px solid #10B981; border-top-color:transparent; transform:rotate(-90deg); display:flex; align-items:center; justify-content:center;">
+            <i data-lucide="award" style="color:#10B981; transform:rotate(90deg);"></i>
+          </div>
+        </div>
+      </div>
+
+      <h2 class="section-title gsap-up">What should we learn today?</h2>
+      
+      <div class="ai-actions-grid gsap-up">
+        <div class="ai-tool-card active" data-tool="explain">
+          <div class="ai-tool-icon"><i data-lucide="book-open"></i></div>
+          <div class="ai-tool-title">Concept Explanation</div>
+          <div class="ai-tool-desc">Deep-dive into complex topics with interactive examples.</div>
+        </div>
+        <div class="ai-tool-card" data-tool="qa">
+          <div class="ai-tool-icon"><i data-lucide="message-square"></i></div>
+          <div class="ai-tool-title">Intelligent Q&A</div>
+          <div class="ai-tool-desc">Get accurate answers backed by curated academic sources.</div>
+        </div>
+        <div class="ai-tool-card" data-tool="quiz">
+          <div class="ai-tool-icon"><i data-lucide="check-square"></i></div>
+          <div class="ai-tool-title">Quiz Generator</div>
+          <div class="ai-tool-desc">Test your retention with dynamically generated exams.</div>
+        </div>
+        <div class="ai-tool-card" data-tool="summarize">
+          <div class="ai-tool-icon"><i data-lucide="align-left"></i></div>
+          <div class="ai-tool-title">Text Summarizer</div>
+          <div class="ai-tool-desc">Distill massive documents into key takeaways instantly.</div>
+        </div>
+        <div class="ai-tool-card" data-tool="roadmap">
+          <div class="ai-tool-icon"><i data-lucide="map"></i></div>
+          <div class="ai-tool-title">Learning Roadmap</div>
+          <div class="ai-tool-desc">Generate a step-by-step curriculum for any new skill.</div>
+        </div>
+      </div>
+
+      <!-- Modular Dashboard Layout -->
+      <div style="display: grid; grid-template-columns: 1fr 320px; gap: var(--space-2xl); align-items: start;" class="gsap-up">
+        
+        <!-- Left Column -->
+        <div style="display: flex; flex-direction: column; gap: var(--space-2xl);">
+          
+          <!-- The Modular Tool Workspace -->
+          <div class="tool-workspace" id="tool-section">
+            <div class="workspace-header" style="background:var(--surface);">
+              <div class="workspace-title" id="tool-title" style="text-transform:uppercase; font-size:1rem; letter-spacing:0.05em; font-weight:800;">
+                <i data-lucide="book-open" style="color:var(--text-main);"></i> CONCEPT EXPLANATION
+              </div>
+              <div id="char-count" style="font-family:var(--font-mono);font-size:0.85rem;color:var(--text-tertiary)">0/2000 chars &nbsp;|&nbsp; 0 words <i data-lucide="sparkles" style="width:14px; margin-left:4px;"></i></div>
+            </div>
+
+            <div class="workspace-body">
+              <div id="tool-options" style="display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap;">
+                <!-- Buttons injected by JS will go here, styled to match the screenshot badges -->
+              </div>
+
+              <div id="file-drop-zone" class="file-drop-zone" style="display:none;">
+                <i data-lucide="upload-cloud" style="width:32px;height:32px;color:var(--primary);margin-bottom:12px;"></i>
+                <div style="font-weight:600; color:var(--text-main);">Click or drag file to upload</div>
+                <div style="font-size:0.85rem;color:var(--text-sec);margin-top:4px;">Supports PDF, TXT, DOCX</div>
+                <input type="file" id="file-input" style="display:none" />
+                <div id="file-label" style="font-size:0.85rem;font-weight:600;color:var(--primary);margin-top:8px;"></div>
+              </div>
+
+              <div style="display: flex; flex-direction: column; gap: 12px;">
+                <textarea class="tool-textarea" id="tool-textarea" placeholder="Enter the topic or concept to explain (e.g., Database Management Systems, OSI Model)" style="min-height:120px; margin-bottom:0;"></textarea>
+                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                  <div id="schedule-container" style="display: none; align-items: center; gap: 8px;">
+                    <input type="datetime-local" id="schedule-time" style="padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; font-family: var(--font-sans); color: var(--text-main); background: var(--surface);">
+                    <button class="btn btn-secondary" id="schedule-btn" style="padding: 10px 16px; border-radius: 12px; font-weight: 600; display: flex; align-items: center; gap: 6px;">
+                      <i data-lucide="clock" style="width:16px;"></i> Schedule
+                    </button>
+                  </div>
+                  <button class="btn btn-primary" id="generate-btn" style="padding: 12px 24px; border-radius: 12px; font-weight: 700; display: flex; align-items: center; gap: 8px; box-shadow: var(--shadow-md); transition: all 0.3s ease; margin-left: auto;">
+                    <i data-lucide="sparkles" style="width:18px;"></i> Generate Answer
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="response-area" id="response-area">
+              <div class="response-header">
+                <div class="response-title"><i data-lucide="sparkles"></i> AI Response</div>
+                <div style="display:flex;gap:8px;">
+                  <button class="icon-btn" style="width:32px;height:32px;"><i data-lucide="copy" style="width:16px;"></i></button>
+                  <button class="icon-btn" style="width:32px;height:32px;"><i data-lucide="bookmark" style="width:16px;"></i></button>
+                </div>
+              </div>
+              <div class="response-body markdown-output" id="response-body"></div>
+            </div>
+          </div>
+          
+          <!-- Activity Row -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-xl);">
+            
+            <!-- Learning Activity Graph -->
+            <div class="card" style="padding: var(--space-xl); background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-xl);">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:var(--space-md);">
+                <div style="font-weight:700; font-size:1.05rem; color:var(--text-main);">Your Learning Activity</div>
+                <div style="font-size:0.8rem; color:var(--text-sec); border:1px solid var(--border); border-radius:4px; padding:2px 8px;">This Week <i data-lucide="chevron-down" style="width:12px; vertical-align:middle;"></i></div>
+              </div>
+              <div style="display:flex; gap:16px; align-items:center;">
+                <div style="flex:1; height:120px; background:var(--surface-alt); border-radius:8px; display:flex; align-items:flex-end; gap:4px; padding:12px; justify-content:center;" id="learning-activity-chart">
+                  <!-- Chart bars injected via JS -->
+                </div>
+                <div style="text-align:center;">
+                  <div style="font-size:0.75rem; color:var(--text-sec); text-transform:uppercase; font-weight:700; letter-spacing:0.05em; display:flex; align-items:center; gap:4px;"><i data-lucide="clock" style="width:12px;"></i> Total Study Time</div>
+                  <div style="font-size:1.75rem; font-weight:800; color:var(--text-main); margin:4px 0;" id="learning-total-time">0h 0m</div>
+                  <div style="font-size:0.8rem; color:#10B981; font-weight:600;" id="learning-trend"></div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Recent Activity List -->
+            <div class="card" style="padding: var(--space-xl); background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-xl);">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:var(--space-md);">
+                <div style="font-weight:700; font-size:1.05rem; color:var(--text-main);">Recent Activity</div>
+                <a href="/history" style="font-size:0.85rem; color:var(--primary); font-weight:600; text-decoration:none;">View all</a>
+              </div>
+              <div id="recent-activity-list" style="display:flex; flex-direction:column; gap:16px;">
+                <!-- Recent Activity Injected by JS -->
+                <div style="font-size:0.85rem; color:var(--text-sec); text-align:center; padding: 20px 0;">Loading activity...</div>
+              </div>
+            </div>
+            
+          </div>
+          
+          <!-- Daily Challenge / Quick Start -->
+          <div class="card" style="margin-top: var(--space-xl); padding: var(--space-2xl); background: linear-gradient(135deg, rgba(91, 141, 255, 0.1) 0%, rgba(139, 92, 246, 0.05) 100%); border: 1px solid rgba(91, 141, 255, 0.2); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: space-between; gap: var(--space-2xl);">
+            <div style="flex: 1;">
+              <div style="font-size: 0.85rem; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;"><i data-lucide="zap" style="width:16px;"></i> Daily Challenge</div>
+              <h3 style="font-size: 1.5rem; font-weight: 800; color: var(--text-main); margin: 0 0 8px 0; letter-spacing: -0.02em;">Master "System Design Basics"</h3>
+              <p style="color: var(--text-sec); font-size: 1rem; margin: 0; line-height: 1.5;">Keep your study streak alive! Take a quick 5-question AI-generated quiz to test your knowledge and boost your daily focus score.</p>
+            </div>
+            <button class="btn btn-primary" style="padding: 16px 32px; font-size: 1.05rem; border-radius: var(--radius-full); font-weight: 700; display: flex; align-items: center; gap: 8px; box-shadow: 0 8px 16px rgba(91, 141, 255, 0.25); white-space: nowrap; transition: all 0.2s ease;" onclick="document.querySelector('[data-tool=\'quiz\']').click(); setTimeout(()=> { document.getElementById('tool-textarea').value = 'System Design Basics'; document.getElementById('generate-btn').click(); }, 100);" onmouseover="this.style.transform='translateY(-2px)';" onmouseout="this.style.transform='translateY(0)';">
+              Start Challenge <i data-lucide="arrow-right" style="width:18px;"></i>
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Dashboard Right Sidebar -->
+        <div style="display:flex; flex-direction:column; gap:var(--space-xl);">
+          
+
+
+          <!-- Continue Learning -->
+          <div class="card" id="continue-learning-card" style="padding: var(--space-xl); background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-xl);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:var(--space-md);">
+              <div style="font-weight:700; font-size:1.05rem; color:var(--text-main);">Continue Learning</div>
+              <a href="/notes" style="font-size:0.85rem; color:var(--primary); font-weight:600; text-decoration:none;">View all</a>
+            </div>
+            <div id="continue-learning-content">
+              <div style="font-size:0.85rem; color:var(--text-sec); padding: 12px 0;">Loading your latest notes...</div>
+            </div>
+          </div>
+          
+          <div class="card" style="padding: var(--space-xl); background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-xl);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:var(--space-md);">
+              <div style="font-weight:700; font-size:1.05rem; color:var(--text-main); display:flex; align-items:center; gap:8px;"><i data-lucide="target" style="width:18px; color:var(--primary);"></i> Today's Goals</div>
+              <button id="edit-goals-btn" style="font-size:0.85rem; color:var(--primary); font-weight:600; text-decoration:none; background:none; border:none; cursor:pointer;">Edit</button>
+            </div>
+            <div id="todays-goals-list">
+              <!-- Goals injected by JS -->
+            </div>
+            
+            <!-- Add new goal quick input -->
+            <div style="display:flex; margin-top: 12px; gap: 8px;">
+              <input type="text" id="new-goal-input" placeholder="Add a new goal..." style="flex:1; padding: 6px 12px; font-size: 0.85rem; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--bg); outline: none; color: var(--text-main);">
+              <button id="add-goal-btn" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85rem;"><i data-lucide="plus" style="width: 14px;"></i></button>
+            </div>
+
+            <div style="height:1px; background:var(--border); margin:16px 0;"></div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <div style="font-size:0.8rem; font-weight:600; color:var(--text-sec);" id="goals-progress-text">0 / 0 Completed</div>
+              <div style="font-size:0.8rem; font-weight:600; color:var(--text-main);" id="goals-progress-percent">0%</div>
+            </div>
+            <div style="width:100%; height:6px; background:var(--surface-alt); border-radius:3px;">
+              <div id="goals-progress-bar" style="width:0%; height:100%; background:var(--primary); border-radius:3px; transition: width 0.3s;"></div>
+            </div>
+          </div>
+
+          <div class="card" id="ai-recs-card" style="padding: var(--space-xl); background:var(--primary-soft); border:1px solid var(--border); border-radius:var(--radius-xl);">
+            <div style="font-weight:700; font-size:1.05rem; margin-bottom: var(--space-md); color:var(--text-main); display:flex; align-items:center; gap:8px;"><i data-lucide="sparkles" style="width:18px; color:var(--primary);"></i> AI Recommendations</div>
+            <div id="ai-recs-content">
+              <div style="font-size:0.95rem; color:var(--text-main); margin-bottom:12px;">Generating insights...</div>
+            </div>
+          </div>
+
+          <div id="scheduled-quizzes-container" style="display: none;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:var(--space-md);">
+              <div style="font-weight:700; font-size:1.05rem; color:var(--text-main); display: flex; align-items: center; gap: 8px;">
+                <i data-lucide="calendar" style="color: var(--primary);"></i> Upcoming Quizzes
+              </div>
+              <button onclick="document.querySelector('[data-tool=\'quiz\']').click(); document.getElementById('tool-textarea').focus();" style="background:none; border:none; font-size:0.85rem; color:var(--primary); font-weight:600; cursor:pointer;"><i data-lucide="plus" style="width:14px; vertical-align:middle;"></i> Add</button>
+            </div>
+            
+            <div id="scheduled-quizzes-list" style="display: flex; flex-direction: column; gap: 12px;">
+              <!-- Scheduled Quizzes injected by JS -->
+            </div>
+          </div>
+
+          <div style="margin-top: 16px;">
+            <a href="/achievements" style="display:flex; align-items:center; gap:8px; color:var(--primary); font-weight:600; font-size:0.9rem; text-decoration:none;">
+              <i data-lucide="award" style="width:16px;"></i> View Your Achievements
+            </a>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Quick Actions Dock -->
+      <div style="position:fixed; bottom:var(--space-2xl); left:50%; transform:translateX(-50%); display:flex; align-items:center; gap:8px; background:var(--surface); padding:8px 16px; border-radius:var(--radius-xl); box-shadow:0 20px 40px rgba(0,0,0,0.1); border:1px solid var(--border); z-index:100;">
+        <div style="font-size:0.75rem; font-weight:700; color:var(--text-sec); margin-right:8px;">Quick Actions</div>
+        
+        <button class="icon-btn quick-action-btn" data-tool="explain" style="width:48px; height:48px; background:var(--primary-soft); color:var(--primary); border:none; display:flex; flex-direction:column; gap:4px; padding:0; justify-content:center; border-radius:12px;">
+          <i data-lucide="sparkles" style="width:16px;"></i>
+          <span style="font-size:0.6rem; font-weight:700;">Explain</span>
+        </button>
+        <button class="icon-btn quick-action-btn" data-tool="qa" style="width:48px; height:48px; border:none; display:flex; flex-direction:column; gap:4px; padding:0; justify-content:center; border-radius:12px; background:transparent;">
+          <i data-lucide="book-open" style="width:16px;"></i>
+          <span style="font-size:0.6rem; font-weight:700;">Q&A</span>
+        </button>
+        <button class="icon-btn quick-action-btn" data-tool="quiz" style="width:48px; height:48px; border:none; display:flex; flex-direction:column; gap:4px; padding:0; justify-content:center; border-radius:12px; background:transparent;">
+          <i data-lucide="check-square" style="width:16px; color:#10B981;"></i>
+          <span style="font-size:0.6rem; font-weight:700;">Quiz</span>
+        </button>
+        <button class="icon-btn quick-action-btn" data-tool="summarize" style="width:48px; height:48px; border:none; display:flex; flex-direction:column; gap:4px; padding:0; justify-content:center; border-radius:12px; background:transparent;">
+          <i data-lucide="align-left" style="width:16px; color:#F59E0B;"></i>
+          <span style="font-size:0.6rem; font-weight:700;">Summarize</span>
+        </button>
+        <button class="icon-btn" onclick="window.location.href='/notes'" style="width:48px; height:48px; border:none; display:flex; flex-direction:column; gap:4px; padding:0; justify-content:center; border-radius:12px; background:transparent;">
+          <i data-lucide="calendar" style="width:16px; color:#8B5CF6;"></i>
+          <span style="font-size:0.6rem; font-weight:700;">Notes</span>
+        </button>
+        <div style="width:1px; height:24px; background:var(--border); margin:0 4px;"></div>
+        <button class="icon-btn quick-action-btn" data-tool="summarize" style="width:48px; height:48px; border:none; display:flex; flex-direction:column; gap:4px; padding:0; justify-content:center; border-radius:12px; background:transparent;">
+          <i data-lucide="upload-cloud" style="width:16px; color:var(--text-sec);"></i>
+          <span style="font-size:0.6rem; font-weight:700;">Upload</span>
+        </button>
+        <button class="icon-btn" onclick="window.location.href='/progress'" style="width:48px; height:48px; border:none; display:flex; flex-direction:column; gap:4px; padding:0; justify-content:center; border-radius:12px; background:transparent; color:var(--text-sec);">
+          <i data-lucide="plus" style="width:16px;"></i>
+          <span style="font-size:0.6rem; font-weight:700;">More</span>
+        </button>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    lucide.createIcons();
+
+    // GSAP Entrance
+    gsap.from(".gsap-up", { y: 40, opacity: 0, duration: 0.8, stagger: 0.1, ease: "power3.out", delay: 0.1 });
+  </script>
+  
+  <!-- Schedule Quiz Modal -->
+  <div class="modal-overlay" id="schedule-modal" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(15,23,42,0.4); backdrop-filter:blur(4px); display:none; align-items:center; justify-content:center; z-index:1000;">
+    <div class="modal" style="background:var(--surface); width:100%; max-width:400px; border-radius:var(--radius-xl); box-shadow:var(--shadow-lg); overflow:hidden;">
+      <div style="padding:var(--space-lg) var(--space-xl); border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+        <div style="font-weight:700; font-size:1.1rem; display:flex; align-items:center; gap:8px;"><i data-lucide="calendar-plus" style="width:20px; color:var(--primary);"></i> Schedule Quiz</div>
+        <button style="background:none; border:none; cursor:pointer; color:var(--text-sec);" onclick="document.getElementById('schedule-modal').style.display='none'"><i data-lucide="x"></i></button>
+      </div>
+      <div style="padding:var(--space-xl);">
+        <div style="margin-bottom:var(--space-md);">
+          <label style="display:block; font-size:0.85rem; font-weight:600; color:var(--text-sec); margin-bottom:8px;">Topic</label>
+          <input type="text" id="schedule-topic-input" placeholder="e.g. Data Structures" style="width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:var(--radius-md); background:var(--bg); color:var(--text-main); outline:none;">
+        </div>
+        <div style="margin-bottom:var(--space-md);">
+          <label style="display:block; font-size:0.85rem; font-weight:600; color:var(--text-sec); margin-bottom:8px;">Time (Today)</label>
+          <input type="time" id="schedule-time-input" style="width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:var(--radius-md); background:var(--bg); color:var(--text-main); outline:none;">
+        </div>
+      </div>
+      <div style="padding:var(--space-md) var(--space-xl); border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:var(--space-md); background:var(--bg);">
+        <button class="btn btn-secondary" onclick="document.getElementById('schedule-modal').style.display='none'">Cancel</button>
+        <button class="btn btn-primary" id="save-schedule-btn">Schedule</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/static/js/dashboard.js"></script>
+</body>
+</html>

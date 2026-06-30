@@ -1,0 +1,3 @@
+"""
+EduGenie — Backend schemas init
+"""

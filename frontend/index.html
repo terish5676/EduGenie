@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EduGenie | Your AI-Powered Learning Assistant</title>
+  <meta name="description" content="EduGenie is your personal AI educational assistant. Ask questions, generate quizzes, summarize notes, and build learning roadmaps instantly.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --blue-950: #0A1628; --blue-900: #0F2040; --blue-800: #1A3460; --blue-700: #1E4080;
+      --blue-600: #2563EB; --blue-500: #3B82F6; --blue-400: #60A5FA; --blue-300: #93C5FD;
+      --blue-200: #BFDBFE; --blue-100: #DBEAFE; --blue-50: #EFF6FF;
+      --sky-400: #38BDF8; --sky-300: #7DD3FC; --sky-100: #E0F2FE;
+      --text-main: #0A1628; --text-sec: #334155; --text-muted: #64748B;
+      --bg: #F0F7FF; --surface: #FFFFFF;
+      --border: rgba(37,99,235,0.12); --border-2: #E2EBFF;
+      --shadow-sm: 0 1px 4px rgba(10,22,40,0.06); --shadow-md: 0 6px 24px rgba(10,22,40,0.10);
+      --shadow-lg: 0 20px 60px rgba(10,22,40,0.13); --shadow-blue: 0 12px 40px rgba(37,99,235,0.22);
+      --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px; --radius-xl: 24px; --radius-full: 9999px;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text-main); line-height:1.6; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+    a { text-decoration:none; color:inherit; }
+
+    /* ── DOT GRID ──────────────────────────────────── */
+    body::before {
+      content:''; position:fixed; inset:0; z-index:0; pointer-events:none;
+      background-image:radial-gradient(circle,#BFDBFE 1px,transparent 1px);
+      background-size:32px 32px; opacity:0.5;
+    }
+
+    /* ── ORBS ──────────────────────────────────────── */
+    .bg-orbs { position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
+    .orb { position:absolute; border-radius:50%; filter:blur(90px); }
+    .orb-1 { width:700px; height:700px; background:radial-gradient(circle,#BFDBFE,#EFF6FF); top:-200px; right:-150px; opacity:0.65; animation:drift 18s ease-in-out infinite alternate; }
+    .orb-2 { width:500px; height:500px; background:radial-gradient(circle,#BAE6FD,#EFF6FF); bottom:0; left:-100px; opacity:0.5; animation:drift 24s ease-in-out infinite alternate-reverse; }
+    .orb-3 { width:320px; height:320px; background:radial-gradient(circle,#93C5FD,transparent); top:40%; left:35%; opacity:0.3; animation:drift 15s ease-in-out infinite alternate; }
+    @keyframes drift { from{transform:translate(0,0) scale(1)} to{transform:translate(28px,22px) scale(1.06)} }
+
+    /* ── NAVBAR ────────────────────────────────────── */
+    .navbar {
+      position:fixed; top:16px; left:50%; transform:translateX(-50%);
+      width:calc(100% - 48px); max-width:1280px; z-index:1000;
+      padding:0 28px; height:64px;
+      display:flex; align-items:center; justify-content:space-between;
+      background:rgba(255,255,255,0.9); backdrop-filter:blur(24px) saturate(180%);
+      border:1px solid rgba(37,99,235,0.15); border-radius:20px;
+      box-shadow:0 4px 24px rgba(37,99,235,0.08); transition:all 0.3s;
+    }
+    .navbar.scrolled { top:8px; box-shadow:0 8px 32px rgba(37,99,235,0.14); }
+    .brand { display:flex; align-items:center; gap:10px; font-size:1.18rem; font-weight:800; letter-spacing:-0.03em; color:var(--text-main); text-decoration:none; }
+    .brand-logo { width:34px; height:34px; flex-shrink:0; }
+    .brand-name { color:var(--text-main); letter-spacing:-0.03em; }
+    .brand-name em { font-style:normal; color:var(--blue-600); }
+    .nav-links { display:flex; align-items:center; gap:4px; }
+    .nav-link { padding:7px 16px; border-radius:var(--radius-full); font-size:0.88rem; font-weight:500; color:var(--text-sec); transition:all 0.2s; }
+    .nav-link:hover { color:var(--blue-600); background:var(--blue-50); }
+    .nav-signin { padding:8px 20px; border-radius:var(--radius-full); font-size:0.88rem; font-weight:600; color:var(--blue-700); border:1.5px solid var(--blue-200); background:white; transition:all 0.2s; }
+    .nav-signin:hover { border-color:var(--blue-500); background:var(--blue-50); }
+    .btn-primary-nav { padding:10px 22px; border-radius:var(--radius-full); font-size:0.88rem; font-weight:700; background:linear-gradient(135deg,var(--blue-600),var(--blue-900)); color:white; box-shadow:0 4px 16px rgba(37,99,235,0.3); transition:all 0.25s; }
+    .btn-primary-nav:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(37,99,235,0.4); }
+
+    /* ── HERO SECTION — TWO COLUMN ─────────────────── */
+    .hero-section {
+      position:relative; z-index:1;
+      min-height:100vh;
+      display:grid;
+      grid-template-columns:300px 1fr 300px;
+      align-items:flex-start;
+      padding-top:80px;
+      max-width:1400px;
+      margin:0 auto;
+      overflow:visible;
+    }
+
+    /* LEFT PANEL */
+    .hero-left-panel {
+      display:flex; flex-direction:column; justify-content:flex-start;
+      padding:84px 16px 40px 40px; gap:12px;
+    }
+    .side-feature-card {
+      background:white; border:1px solid var(--border-2); border-radius:16px;
+      padding:16px 18px; box-shadow:var(--shadow-md);
+      display:flex; align-items:center; gap:12px;
+      animation:slideRight 0.8s ease forwards; opacity:0; transition: all 0.2s;
+    }
+    .side-feature-card:hover { transform:translateX(4px); box-shadow:var(--shadow-lg); border-color:var(--blue-200); }
+    .side-feature-card:nth-child(1){animation-delay:0.8s;}
+    .side-feature-card:nth-child(2){animation-delay:1.0s;}
+    .side-feature-card:nth-child(3){animation-delay:1.2s;}
+    .side-feature-card:nth-child(4){animation-delay:1.4s;}
+    @keyframes slideRight { from{opacity:0;transform:translateX(-30px)} to{opacity:1;transform:translateX(0)} }
+    .sfc-icon { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; color:white; flex-shrink:0; }
+    .sfc-text .sfc-title { font-size:0.88rem; font-weight:800; color:var(--text-main); }
+    .sfc-text .sfc-desc { font-size:0.76rem; color:var(--text-muted); margin-top:2px; }
+    .sfc-badge { margin-left:auto; padding:4px 10px; border-radius:var(--radius-full); font-size:0.68rem; font-weight:800; flex-shrink:0; }
+
+    .hero-center {
+      display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
+      text-align:center; padding:84px 32px 60px;
+    }
+    .hero-badge {
+      display:inline-flex; align-items:center; gap:8px;
+      background:white; border:1px solid var(--blue-200);
+      padding:8px 20px; border-radius:var(--radius-full);
+      font-size:0.75rem; font-weight:700; color:var(--blue-700);
+      letter-spacing:0.07em; text-transform:uppercase;
+      box-shadow:0 2px 12px rgba(37,99,235,0.1);
+      margin-bottom:28px; opacity:0; transform:translateY(16px);
+    }
+    .badge-dot { width:8px; height:8px; border-radius:50%; background:var(--blue-500); animation:pulseDot 2s ease-in-out infinite; }
+    @keyframes pulseDot { 0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(1.6)} }
+    .hero-title {
+      font-size:clamp(2.8rem,6vw,5.5rem);
+      font-weight:900; letter-spacing:-0.045em; line-height:1.05;
+      color:var(--text-main); margin-bottom:22px;
+      opacity:0; transform:translateY(28px);
+    }
+    .hero-title .blue-grad {
+      background:linear-gradient(135deg,var(--blue-600) 0%,var(--blue-400) 50%,var(--sky-400) 100%);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    }
+    .hero-sub {
+      font-size:1.08rem; color:var(--text-sec); max-width:480px; line-height:1.75;
+      margin-bottom:40px; opacity:0; transform:translateY(20px);
+    }
+    .hero-cta-row {
+      display:flex; align-items:center; gap:12px; flex-wrap:wrap; justify-content:center;
+      margin-bottom:48px; opacity:0; transform:translateY(20px);
+    }
+    .btn-hero { display:inline-flex; align-items:center; gap:8px; padding:15px 34px; border-radius:var(--radius-full); font-size:0.98rem; font-weight:700; background:linear-gradient(135deg,var(--blue-600),var(--blue-900)); color:white; box-shadow:var(--shadow-blue); transition:all 0.3s; }
+    .btn-hero:hover { transform:translateY(-3px); box-shadow:0 18px 50px rgba(37,99,235,0.4); }
+    .btn-ghost { display:inline-flex; align-items:center; gap:8px; padding:13px 24px; border-radius:var(--radius-full); font-size:0.92rem; font-weight:600; background:white; color:var(--text-main); border:1.5px solid var(--border-2); box-shadow:var(--shadow-sm); transition:all 0.25s; }
+    .btn-ghost:hover { border-color:var(--blue-400); color:var(--blue-700); transform:translateY(-2px); box-shadow:var(--shadow-md); }
+    .trust-bar { display:flex; align-items:center; gap:20px; flex-wrap:wrap; justify-content:center; opacity:0; transform:translateY(16px); }
+    .trust-item { display:flex; align-items:center; gap:7px; font-size:0.8rem; font-weight:600; color:var(--text-sec); }
+    .trust-icon { width:28px; height:28px; border-radius:7px; background:var(--blue-50); border:1px solid var(--blue-100); display:flex; align-items:center; justify-content:center; color:var(--blue-600); }
+    .trust-div { width:1px; height:18px; background:var(--border-2); }
+
+    /* RIGHT PANEL */
+    .hero-right-panel {
+      display:flex; flex-direction:column; justify-content:flex-start;
+      padding:84px 40px 40px 16px; gap:12px;
+    }
+    .side-stat-card {
+      background:white; border:1px solid var(--border-2); border-radius:16px;
+      padding:16px 18px; box-shadow:var(--shadow-md);
+      animation:slideLeft 0.8s ease forwards; opacity:0;
+    }
+    .side-stat-card:nth-child(1){animation-delay:0.9s;}
+    .side-stat-card:nth-child(2){animation-delay:1.1s;}
+    .side-stat-card:nth-child(3){animation-delay:1.3s;}
+    .side-stat-card:nth-child(4){animation-delay:1.5s;}
+    @keyframes slideLeft { from{opacity:0;transform:translateX(30px)} to{opacity:1;transform:translateX(0)} }
+    .ssc-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+    .ssc-label { font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); }
+    .ssc-icon { width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; }
+    .ssc-value { font-size:1.5rem; font-weight:900; letter-spacing:-0.03em; color:var(--text-main); }
+    .ssc-sub { font-size:0.7rem; color:var(--text-muted); margin-top:2px; }
+    .ssc-bar { height:5px; border-radius:3px; background:var(--blue-50); margin-top:8px; overflow:hidden; }
+    .ssc-bar-fill { height:100%; border-radius:3px; background:linear-gradient(90deg,var(--blue-500),var(--sky-400)); }
+    .ssc-trend { display:flex; align-items:center; gap:4px; font-size:0.7rem; font-weight:700; color:#10B981; margin-top:5px; }
+
+    /* ── APP PREVIEW BELOW HERO CENTER ─────────────── */
+    .app-preview-wrap {
+      position:relative; z-index:1;
+      max-width:1200px; margin:-20px auto 0;
+      padding:0 40px 80px;
+    }
+    .app-preview {
+      background:white; border-radius:24px;
+      border:1px solid var(--border-2);
+      box-shadow:var(--shadow-lg), 0 0 100px rgba(37,99,235,0.1);
+      overflow:hidden;
+    }
+    .app-bar {
+      height:42px; background:var(--blue-50); border-bottom:1px solid var(--border-2);
+      display:flex; align-items:center; padding:0 16px; gap:8px;
+    }
+    .win-dot { width:11px; height:11px; border-radius:50%; }
+    .app-url {
+      flex:1; margin:0 10px; height:24px; background:white; border:1px solid var(--border-2);
+      border-radius:var(--radius-full); display:flex; align-items:center; padding:0 10px;
+      font-size:0.72rem; color:var(--text-muted); gap:5px;
+    }
+    .app-body { display:grid; grid-template-columns:220px 1fr 280px; min-height:360px; }
+    .app-sidebar { background:var(--blue-50); border-right:1px solid var(--border-2); padding:18px 12px; display:flex; flex-direction:column; gap:3px; }
+    .app-nav-section { font-size:0.62rem; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.08em; padding:10px 12px 4px; }
+    .app-nav { padding:9px 12px; border-radius:10px; font-size:0.78rem; font-weight:500; color:var(--text-sec); display:flex; align-items:center; gap:8px; cursor:pointer; }
+    .app-nav.active { background:white; color:var(--blue-700); font-weight:700; box-shadow:var(--shadow-sm); border:1px solid var(--blue-100); }
+    .app-sidebar-goal { margin-top:auto; background:linear-gradient(135deg,var(--blue-600),var(--blue-900)); border-radius:12px; padding:14px; color:white; }
+    .app-main { padding:22px; display:flex; flex-direction:column; gap:14px; }
+    .app-main-top { display:flex; justify-content:space-between; align-items:center; }
+    .app-main-title { font-size:0.92rem; font-weight:800; color:var(--text-main); }
+    .tool-row { display:flex; gap:7px; flex-wrap:wrap; }
+    .tool-chip { padding:5px 14px; border-radius:var(--radius-full); font-size:0.72rem; font-weight:700; background:var(--blue-50); color:var(--blue-700); border:1.5px solid var(--blue-100); cursor:pointer; transition:all 0.15s; }
+    .tool-chip.active { background:var(--blue-700); color:white; border-color:var(--blue-700); }
+    .app-response { background:linear-gradient(135deg,var(--blue-50),white); border:1px solid var(--blue-100); border-radius:14px; padding:18px; font-size:0.82rem; line-height:1.75; color:var(--text-sec); flex:1; }
+    .app-response h4 { color:var(--blue-800); font-size:0.86rem; margin-bottom:10px; font-weight:800; }
+    .hl { color:var(--blue-600); font-weight:700; }
+    .app-input { background:var(--blue-50); border:1.5px solid var(--blue-100); border-radius:12px; padding:12px 16px; display:flex; align-items:center; gap:10px; font-size:0.8rem; color:var(--text-muted); }
+    .send-btn { margin-left:auto; width:30px; height:30px; border-radius:8px; background:var(--blue-600); display:flex; align-items:center; justify-content:center; color:white; flex-shrink:0; }
+
+    /* Right panel of app preview */
+    .app-right { border-left:1px solid var(--border-2); padding:20px 18px; display:flex; flex-direction:column; gap:16px; }
+    .app-right-section { font-size:0.68rem; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px; }
+    .app-stat-mini { display:flex; align-items:center; justify-content:space-between; padding:10px 12px; background:var(--blue-50); border:1px solid var(--blue-100); border-radius:10px; margin-bottom:8px; }
+    .app-stat-mini-left { display:flex; align-items:center; gap:8px; }
+    .app-stat-mini-icon { width:28px; height:28px; border-radius:7px; display:flex; align-items:center; justify-content:center; }
+    .app-stat-mini-label { font-size:0.75rem; font-weight:600; color:var(--text-sec); }
+    .app-stat-mini-val { font-size:0.9rem; font-weight:800; color:var(--text-main); }
+    .quiz-item-mini { background:white; border:1px solid var(--border-2); border-radius:10px; padding:10px 12px; font-size:0.75rem; margin-bottom:7px; }
+    .quiz-item-mini-q { font-weight:700; color:var(--text-main); margin-bottom:6px; }
+    .quiz-opt-mini { padding:5px 10px; border-radius:6px; border:1.5px solid var(--border-2); background:var(--bg); color:var(--text-sec); font-size:0.72rem; margin-bottom:4px; }
+    .quiz-opt-mini.correct { border-color:#10B981; background:#ECFDF5; color:#065F46; font-weight:700; }
+
+    /* ── STATS BAND ─────────────────────────────────── */
+    .stats-band { position:relative; z-index:1; background:white; border-top:1px solid var(--border-2); border-bottom:1px solid var(--border-2); padding:48px 5%; display:grid; grid-template-columns:repeat(4,1fr); }
+    .stat-item { text-align:center; padding:16px; }
+    .stat-item+.stat-item { border-left:1px solid var(--border-2); }
+    .stat-val { font-size:2.6rem; font-weight:900; letter-spacing:-0.04em; background:linear-gradient(135deg,var(--blue-700),var(--blue-400)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .stat-label { font-size:0.84rem; font-weight:600; color:var(--text-muted); margin-top:4px; }
+
+    /* ── SECTIONS ───────────────────────────────────── */
+    .section { padding:100px 5%; position:relative; z-index:1; }
+    .container { max-width:1280px; margin:0 auto; }
+    .sec-eyebrow { display:inline-flex; align-items:center; gap:8px; font-size:0.74rem; font-weight:800; text-transform:uppercase; letter-spacing:0.08em; color:var(--blue-600); margin-bottom:14px; }
+    .sec-eyebrow::before { content:''; display:block; width:18px; height:2px; background:var(--blue-500); border-radius:2px; }
+    .sec-title { font-size:clamp(1.8rem,4vw,2.8rem); font-weight:900; letter-spacing:-0.03em; color:var(--text-main); line-height:1.15; margin-bottom:16px; }
+    .sec-sub { font-size:1.05rem; color:var(--text-sec); max-width:520px; line-height:1.7; }
+
+    /* ── FEATURES BENTO ─────────────────────────────── */
+    .bento { display:grid; grid-template-columns:repeat(12,1fr); gap:18px; margin-top:56px; }
+    .bc { border-radius:var(--radius-xl); padding:32px; border:1px solid var(--border-2); overflow:hidden; position:relative; transition:all 0.35s cubic-bezier(0.34,1.4,0.64,1); }
+    .bc:hover { transform:translateY(-6px); box-shadow:var(--shadow-lg); }
+    .sp-8{grid-column:span 8;} .sp-4{grid-column:span 4;} .sp-5{grid-column:span 5;} .sp-7{grid-column:span 7;} .sp-6{grid-column:span 6;} .sp-12{grid-column:span 12;}
+    .bc-chip { display:inline-flex; align-items:center; gap:5px; padding:5px 12px; border-radius:var(--radius-full); font-size:0.7rem; font-weight:800; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:14px; }
+    .bc-title { font-size:1.25rem; font-weight:800; letter-spacing:-0.025em; margin-bottom:9px; }
+    .bc-desc { font-size:0.9rem; color:var(--text-sec); line-height:1.65; }
+    .mini-msg { padding:10px 14px; border-radius:10px; font-size:0.79rem; line-height:1.6; }
+    .msg-user { background:var(--blue-50); border:1px solid var(--blue-100); color:var(--text-main); align-self:flex-end; max-width:80%; }
+    .msg-ai { background:white; border:1px solid var(--border-2); color:var(--text-sec); align-self:flex-start; max-width:90%; }
+    .msg-ai strong { color:var(--blue-700); }
+    .q-opt { display:flex; align-items:center; gap:10px; padding:10px 14px; border-radius:10px; border:1.5px solid var(--border-2); background:white; font-size:0.8rem; margin-bottom:8px; }
+    .q-opt.correct { border-color:#10B981; background:#ECFDF5; color:#065F46; font-weight:700; }
+    .q-letter { width:22px; height:22px; border-radius:6px; background:var(--blue-50); display:flex; align-items:center; justify-content:center; font-size:0.68rem; font-weight:800; color:var(--blue-600); flex-shrink:0; }
+    .q-opt.correct .q-letter { background:#D1FAE5; color:#065F46; }
+    .pb-row { margin-bottom:12px; }
+    .pb-labels { display:flex; justify-content:space-between; font-size:0.76rem; font-weight:600; color:var(--text-sec); margin-bottom:5px; }
+    .pb-labels span:last-child { color:var(--blue-600); }
+    .pb-track { height:7px; background:var(--blue-50); border-radius:4px; overflow:hidden; }
+    .pb-fill { height:100%; border-radius:4px; background:linear-gradient(90deg,var(--blue-500),var(--sky-400)); }
+    .rm-step { background:white; border:1px solid var(--blue-100); border-radius:12px; padding:12px 16px; font-size:0.8rem; display:flex; align-items:center; gap:12px; margin-bottom:8px; }
+    .rm-num { width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; color:white; font-size:0.75rem; font-weight:800; flex-shrink:0; }
+    .rm-title { font-weight:700; color:var(--text-main); }
+    .rm-meta { font-size:0.72rem; color:var(--text-muted); }
+
+    /* ── HOW IT WORKS ───────────────────────────────── */
+    .hiw-steps { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; margin-top:56px; }
+    .hiw-card { background:white; border:1px solid var(--border-2); border-radius:var(--radius-xl); padding:36px; position:relative; overflow:hidden; transition:all 0.3s; }
+    .hiw-card:hover { transform:translateY(-4px); box-shadow:var(--shadow-md); }
+    .hiw-num { position:absolute; top:20px; right:22px; font-size:5rem; font-weight:900; letter-spacing:-0.05em; color:var(--blue-600); opacity:0.06; line-height:1; }
+    .hiw-icon { width:52px; height:52px; border-radius:14px; display:flex; align-items:center; justify-content:center; margin-bottom:20px; }
+    .hiw-title { font-size:1.1rem; font-weight:800; margin-bottom:10px; letter-spacing:-0.02em; }
+    .hiw-desc { font-size:0.9rem; color:var(--text-sec); line-height:1.65; }
+
+    /* ── TESTIMONIALS ───────────────────────────────── */
+    .testimonial-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-top:56px; }
+    .tcard { background:white; border:1px solid var(--border-2); border-radius:var(--radius-xl); padding:28px; box-shadow:var(--shadow-sm); transition:all 0.3s; }
+    .tcard:hover { transform:translateY(-4px); box-shadow:var(--shadow-md); border-color:var(--blue-200); }
+    .t-stars { color:#F59E0B; font-size:0.9rem; letter-spacing:2px; margin-bottom:14px; }
+    .t-quote { font-size:0.93rem; color:var(--text-sec); line-height:1.72; margin-bottom:20px; font-style:italic; }
+    .t-author { display:flex; align-items:center; gap:12px; }
+    .t-avatar { width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.82rem; font-weight:800; color:white; flex-shrink:0; }
+    .t-name { font-weight:700; font-size:0.88rem; }
+    .t-role { font-size:0.78rem; color:var(--text-muted); }
+
+    /* ── CTA ────────────────────────────────────────── */
+    .cta-wrap { padding:100px 5%; position:relative; z-index:1; }
+    .cta-card { max-width:960px; margin:0 auto; background:linear-gradient(135deg,var(--blue-800) 0%,var(--blue-950) 100%); border-radius:32px; padding:80px 60px; text-align:center; position:relative; overflow:hidden; box-shadow:0 30px 80px rgba(10,22,40,0.25); }
+    .cta-orb { position:absolute; border-radius:50%; }
+    .cta-orb-1 { width:400px; height:400px; background:radial-gradient(circle,rgba(96,165,250,0.25),transparent); top:-100px; right:-100px; }
+    .cta-orb-2 { width:300px; height:300px; background:radial-gradient(circle,rgba(56,189,248,0.15),transparent); bottom:-80px; left:-80px; }
+    .cta-dot-grid { position:absolute; inset:0; background-image:radial-gradient(circle,rgba(255,255,255,0.07) 1px,transparent 1px); background-size:28px 28px; }
+    .cta-inner { position:relative; z-index:2; }
+    .cta-badge { display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); padding:6px 16px; border-radius:var(--radius-full); font-size:0.74rem; font-weight:700; color:var(--blue-200); letter-spacing:0.06em; text-transform:uppercase; margin-bottom:24px; }
+    .cta-title { font-size:clamp(2rem,4vw,3rem); font-weight:900; letter-spacing:-0.03em; color:white; margin-bottom:18px; line-height:1.1; }
+    .cta-sub { font-size:1.08rem; color:var(--blue-300); margin-bottom:40px; }
+    .cta-actions { display:flex; justify-content:center; gap:14px; flex-wrap:wrap; }
+    .btn-cta-white { display:inline-flex; align-items:center; gap:8px; padding:15px 36px; border-radius:var(--radius-full); font-size:1rem; font-weight:700; background:white; color:var(--blue-800); box-shadow:0 8px 30px rgba(0,0,0,0.2); transition:all 0.3s; }
+    .btn-cta-white:hover { transform:translateY(-3px); box-shadow:0 16px 40px rgba(0,0,0,0.3); }
+    .btn-cta-outline { display:inline-flex; align-items:center; gap:8px; padding:13px 28px; border-radius:var(--radius-full); font-size:0.95rem; font-weight:600; background:transparent; color:var(--blue-200); border:1.5px solid rgba(255,255,255,0.25); transition:all 0.25s; }
+    .btn-cta-outline:hover { border-color:rgba(255,255,255,0.5); color:white; }
+    .cta-trust { display:flex; justify-content:center; gap:20px; margin-top:28px; flex-wrap:wrap; }
+    .cta-trust-item { display:flex; align-items:center; gap:6px; font-size:0.8rem; color:var(--blue-300); font-weight:600; }
+
+    /* ── FOOTER ─────────────────────────────────────── */
+    footer { background:white; border-top:1px solid var(--border-2); padding:40px 5%; position:relative; z-index:1; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:20px; }
+    .footer-brand { display:flex; align-items:center; gap:9px; font-weight:800; font-size:0.95rem; color:var(--text-main); }
+    .footer-brand img { width:28px; height:28px; }
+    .footer-links { display:flex; gap:20px; }
+    .footer-links a { font-size:0.85rem; color:var(--text-muted); transition:color 0.2s; }
+    .footer-links a:hover { color:var(--blue-600); }
+    .footer-copy { font-size:0.8rem; color:var(--text-muted); }
+
+    /* ── SCROLL REVEAL ──────────────────────────────── */
+    .reveal { opacity:0; transform:translateY(28px); }
+
+    @media (max-width:1100px) {
+      .hero-section { grid-template-columns:1fr; }
+      .hero-left-panel,.hero-right-panel { display:none; }
+      .hero-center { padding:140px 24px 60px; }
+      .app-body { grid-template-columns:1fr; }
+      .app-sidebar,.app-right { display:none; }
+      .bento { grid-template-columns:1fr 1fr; }
+      .sp-8,.sp-4,.sp-7,.sp-5,.sp-6,.sp-12 { grid-column:span 2; }
+      .hiw-steps,.testimonial-grid { grid-template-columns:1fr; }
+      .stats-band { grid-template-columns:1fr 1fr; }
+    }
+    @media (max-width:640px) {
+      .cta-card { padding:48px 24px; }
+      footer { flex-direction:column; text-align:center; }
+      .nav-link { display:none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-orbs"><div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div></div>
+
+  <!-- Navbar -->
+  <nav class="navbar" id="navbar">
+    <a href="/" class="brand">
+      <img src="/static/assets/logo.svg" alt="EduGenie" class="brand-logo">
+      <span class="brand-name">Edu<em>Genie</em></span>
+    </a>
+    <div class="nav-links">
+      <a href="#features" class="nav-link">Features</a>
+      <a href="#how-it-works" class="nav-link">How it Works</a>
+      <a href="#testimonials" class="nav-link">Reviews</a>
+      <a href="/login" class="nav-signin">Sign In</a>
+      <a href="/signup" class="btn-primary-nav">Get Started Free</a>
+    </div>
+  </nav>
+
+  <!-- HERO — 3 Column Layout -->
+  <div class="hero-section">
+
+    <!-- LEFT PANEL: Feature preview cards -->
+    <div class="hero-left-panel">
+      <div style="font-size:0.67rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);padding:0 2px;margin-bottom:4px;display:flex;align-items:center;gap:7px;"><span style="width:14px;height:2px;background:var(--blue-400);border-radius:2px;display:inline-block;"></span>AI Tools</div>
+      <div class="side-feature-card">
+        <div class="sfc-icon" style="background:linear-gradient(135deg,#2563EB,#1E3A8A);"><i data-lucide="message-square" style="width:18px;"></i></div>
+        <div class="sfc-text">
+          <div class="sfc-title">Intelligent Q&amp;A</div>
+          <div class="sfc-desc">Deep academic answers instantly</div>
+        </div>
+        <div class="sfc-badge" style="background:var(--blue-50);color:var(--blue-700);">AI</div>
+      </div>
+      <div class="side-feature-card">
+        <div class="sfc-icon" style="background:linear-gradient(135deg,#10B981,#0D9488);"><i data-lucide="check-square" style="width:18px;"></i></div>
+        <div class="sfc-text">
+          <div class="sfc-title">Generative Quizzes</div>
+          <div class="sfc-desc">Test knowledge on any topic</div>
+        </div>
+        <div class="sfc-badge" style="background:#ECFDF5;color:#065F46;">New</div>
+      </div>
+      <div class="side-feature-card">
+        <div class="sfc-icon" style="background:linear-gradient(135deg,#7C3AED,#5B21B6);"><i data-lucide="map" style="width:18px;"></i></div>
+        <div class="sfc-text">
+          <div class="sfc-title">Adaptive Roadmaps</div>
+          <div class="sfc-desc">Personalized learning paths</div>
+        </div>
+        <div class="sfc-badge" style="background:#EDE9FE;color:#5B21B6;">Pro</div>
+      </div>
+      <div class="side-feature-card">
+        <div class="sfc-icon" style="background:linear-gradient(135deg,#F97316,#EA580C);"><i data-lucide="align-left" style="width:18px;"></i></div>
+        <div class="sfc-text">
+          <div class="sfc-title">Smart Summarizer</div>
+          <div class="sfc-desc">Condense pages in seconds</div>
+        </div>
+        <div class="sfc-badge" style="background:#FFF7ED;color:#9A3412;">Fast</div>
+      </div>
+      <div class="side-feature-card">
+        <div class="sfc-icon" style="background:linear-gradient(135deg,var(--blue-400),var(--sky-400));"><i data-lucide="file-text" style="width:18px;"></i></div>
+        <div class="sfc-text">
+          <div class="sfc-title">Smart Notes</div>
+          <div class="sfc-desc">Save &amp; organize knowledge</div>
+        </div>
+        <div class="sfc-badge" style="background:var(--blue-50);color:var(--blue-600);">Save</div>
+      </div>
+      <!-- Trust badge -->
+      <div style="background:linear-gradient(135deg,var(--blue-50),white);border:1px solid var(--blue-100);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:10px;animation:slideRight 0.8s 1.6s ease forwards;opacity:0;">
+        <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--blue-600),var(--blue-900));display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i data-lucide="shield-check" style="width:16px;color:white;"></i></div>
+        <div style="font-size:0.78rem;"><div style="font-weight:700;color:var(--text-main);">Trusted by 10K+ students</div><div style="color:var(--text-muted);font-size:0.7rem;margin-top:2px;">4.9 star rated · Always free to start</div></div>
+      </div>
+      
+      <!-- New Performance Stat -->
+      <div style="background:white;border:1px solid var(--border-2);border-radius:14px;padding:16px;box-shadow:var(--shadow-sm);animation:slideRight 0.8s 1.8s ease forwards;opacity:0;display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="width:28px;height:28px;border-radius:50%;background:#ECFDF5;color:#10B981;display:flex;align-items:center;justify-content:center;"><i data-lucide="trending-up" style="width:14px;"></i></div>
+          <div style="font-size:0.75rem;font-weight:700;color:var(--text-main);">Average Grade Boost</div>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:6px;">
+          <div style="font-size:1.8rem;font-weight:900;color:var(--blue-700);letter-spacing:-0.03em;">+24%</div>
+          <div style="font-size:0.7rem;color:var(--text-muted);font-weight:600;">after 1 month</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CENTER PANEL: Main hero -->
+    <div class="hero-center">
+      <div class="hero-badge" id="h-badge">
+        <div class="badge-dot"></div>
+        AI-Powered Education Platform
+        <i data-lucide="zap" style="width:12px;"></i>
+      </div>
+
+      <h1 class="hero-title" id="h-title">
+        Learn Smarter.<br>
+        <span class="blue-grad">Master Anything.</span>
+      </h1>
+
+      <p class="hero-sub" id="h-sub">
+        Your personal AI tutor that explains concepts, generates quizzes, summarizes notes, and builds custom learning roadmaps — all in seconds.
+      </p>
+
+      <div class="hero-cta-row" id="h-cta">
+        <a href="/signup" class="btn-hero magnetic">
+          Start Learning for Free
+          <i data-lucide="arrow-right" style="width:18px;"></i>
+        </a>
+        <a href="#how-it-works" class="btn-ghost magnetic">
+          <i data-lucide="play-circle" style="width:17px;color:var(--blue-500);"></i>
+          See how it works
+        </a>
+      </div>
+
+      <div class="trust-bar" id="h-trust">
+        <div class="trust-item"><div class="trust-icon"><i data-lucide="users" style="width:13px;"></i></div>10,000+ Students</div>
+        <div class="trust-div"></div>
+        <div class="trust-item"><div class="trust-icon"><i data-lucide="star" style="width:13px;"></i></div>4.9/5 Rating</div>
+        <div class="trust-div"></div>
+        <div class="trust-item"><div class="trust-icon"><i data-lucide="shield-check" style="width:13px;"></i></div>Free to Start</div>
+      </div>
+
+      <!-- Try Asking Demo -->
+      <div style="width:100%;max-width:460px;margin-top:36px;opacity:0;transform:translateY(20px);" id="h-demo">
+        <div style="font-size:0.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+          <span style="width:16px;height:1.5px;background:var(--blue-300);display:inline-block;border-radius:2px;"></span>
+          Try asking EduGenie
+          <span style="width:16px;height:1.5px;background:var(--blue-300);display:inline-block;border-radius:2px;"></span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <a href="/signup" style="display:flex;align-items:center;gap:10px;background:white;border:1px solid var(--border-2);border-radius:12px;padding:12px 16px;text-decoration:none;transition:all 0.2s;cursor:pointer;" onmouseover="this.style.borderColor='var(--blue-400)';this.style.boxShadow='var(--shadow-md)'" onmouseout="this.style.borderColor='var(--border-2)';this.style.boxShadow='none'">
+            <div style="width:30px;height:30px;border-radius:8px;background:var(--blue-50);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i data-lucide="help-circle" style="width:14px;color:var(--blue-600);"></i></div>
+            <div style="flex:1;text-align:left;"><div style="font-size:0.82rem;font-weight:600;color:var(--text-main);">Explain quantum entanglement simply</div><div style="font-size:0.7rem;color:var(--text-muted);">Physics · Concept Explanation</div></div>
+            <i data-lucide="arrow-right" style="width:14px;color:var(--blue-400);flex-shrink:0;"></i>
+          </a>
+          <a href="/signup" style="display:flex;align-items:center;gap:10px;background:white;border:1px solid var(--border-2);border-radius:12px;padding:12px 16px;text-decoration:none;transition:all 0.2s;cursor:pointer;" onmouseover="this.style.borderColor='var(--blue-400)';this.style.boxShadow='var(--shadow-md)'" onmouseout="this.style.borderColor='var(--border-2)';this.style.boxShadow='none'">
+            <div style="width:30px;height:30px;border-radius:8px;background:#ECFDF5;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i data-lucide="check-square" style="width:14px;color:#10B981;"></i></div>
+            <div style="flex:1;text-align:left;"><div style="font-size:0.82rem;font-weight:600;color:var(--text-main);">Generate a quiz on Data Structures</div><div style="font-size:0.7rem;color:var(--text-muted);">CS · Generative Testing</div></div>
+            <i data-lucide="arrow-right" style="width:14px;color:var(--blue-400);flex-shrink:0;"></i>
+          </a>
+          <a href="/signup" style="display:flex;align-items:center;gap:10px;background:white;border:1px solid var(--border-2);border-radius:12px;padding:12px 16px;text-decoration:none;transition:all 0.2s;cursor:pointer;" onmouseover="this.style.borderColor='var(--blue-400)';this.style.boxShadow='var(--shadow-md)'" onmouseout="this.style.borderColor='var(--border-2)';this.style.boxShadow='none'">
+            <div style="width:30px;height:30px;border-radius:8px;background:#FFF7ED;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i data-lucide="map" style="width:14px;color:#F97316;"></i></div>
+            <div style="flex:1;text-align:left;"><div style="font-size:0.82rem;font-weight:600;color:var(--text-main);">Build me a Python learning roadmap</div><div style="font-size:0.7rem;color:var(--text-muted);">Programming · Adaptive Roadmap</div></div>
+            <i data-lucide="arrow-right" style="width:14px;color:var(--blue-400);flex-shrink:0;"></i>
+          </a>
+        </div>
+
+        <!-- Subject pills -->
+        <div style="margin-top:20px;display:flex;flex-wrap:wrap;gap:7px;justify-content:center;">
+          <span style="background:var(--blue-50);border:1px solid var(--blue-100);color:var(--blue-700);padding:5px 13px;border-radius:var(--radius-full);font-size:0.74rem;font-weight:600;">Mathematics</span>
+          <span style="background:#EDE9FE;border:1px solid #DDD6FE;color:#5B21B6;padding:5px 13px;border-radius:var(--radius-full);font-size:0.74rem;font-weight:600;">Computer Science</span>
+          <span style="background:#ECFDF5;border:1px solid #A7F3D0;color:#065F46;padding:5px 13px;border-radius:var(--radius-full);font-size:0.74rem;font-weight:600;">Physics</span>
+          <span style="background:#FFF7ED;border:1px solid #FED7AA;color:#9A3412;padding:5px 13px;border-radius:var(--radius-full);font-size:0.74rem;font-weight:600;">Chemistry</span>
+          <span style="background:var(--blue-50);border:1px solid var(--blue-100);color:var(--blue-700);padding:5px 13px;border-radius:var(--radius-full);font-size:0.74rem;font-weight:600;">History</span>
+          <span style="background:#FDF2F8;border:1px solid #F9A8D4;color:#9D174D;padding:5px 13px;border-radius:var(--radius-full);font-size:0.74rem;font-weight:600;">Biology</span>
+          <span style="background:#F0FDF4;border:1px solid #BBF7D0;color:#14532D;padding:5px 13px;border-radius:var(--radius-full);font-size:0.74rem;font-weight:600;">Economics</span>
+          <span style="background:#EFF6FF;border:1px solid var(--blue-200);color:var(--blue-800);padding:5px 13px;border-radius:var(--radius-full);font-size:0.74rem;font-weight:600;">+43 more</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL: Live stats -->
+    <div class="hero-right-panel">
+      <div style="font-size:0.67rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);padding:0 2px;margin-bottom:4px;display:flex;align-items:center;gap:7px;"><span style="width:14px;height:2px;background:var(--blue-400);border-radius:2px;display:inline-block;"></span>Your Progress</div>
+      <div class="side-stat-card">
+        <div class="ssc-header">
+          <div class="ssc-label">Study Streak</div>
+          <div class="ssc-icon" style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);"><i data-lucide="flame" style="width:15px;color:#F59E0B;"></i></div>
+        </div>
+        <div class="ssc-value">🔥 14 Days</div>
+        <div class="ssc-sub">Personal best streak!</div>
+        <div class="ssc-bar"><div class="ssc-bar-fill" style="width:78%;"></div></div>
+        <div class="ssc-trend"><i data-lucide="trending-up" style="width:12px;"></i> +3 days this week</div>
+      </div>
+      <div class="side-stat-card">
+        <div class="ssc-header">
+          <div class="ssc-label">Quiz Score</div>
+          <div class="ssc-icon" style="background:#ECFDF5;"><i data-lucide="check-circle" style="width:15px;color:#10B981;"></i></div>
+        </div>
+        <div class="ssc-value" style="color:#10B981;">92%</div>
+        <div class="ssc-sub">Last quiz · Data Structures</div>
+        <div class="ssc-bar"><div class="ssc-bar-fill" style="width:92%;background:linear-gradient(90deg,#10B981,#6EE7B7);"></div></div>
+        <div class="ssc-trend" style="color:#10B981;"><i data-lucide="trending-up" style="width:12px;"></i> Top 8% of students</div>
+      </div>
+      <div class="side-stat-card">
+        <div class="ssc-header">
+          <div class="ssc-label">Topics Mastered</div>
+          <div class="ssc-icon" style="background:var(--blue-50);"><i data-lucide="book-open" style="width:15px;color:var(--blue-600);"></i></div>
+        </div>
+        <div class="ssc-value">47</div>
+        <div class="ssc-sub">Across 6 subjects</div>
+        <div class="ssc-bar"><div class="ssc-bar-fill" style="width:62%;"></div></div>
+        <div class="ssc-trend"><i data-lucide="trending-up" style="width:12px;"></i> +12 this month</div>
+      </div>
+      <div class="side-stat-card">
+        <div class="ssc-header">
+          <div class="ssc-label">Today's Study Time</div>
+          <div class="ssc-icon" style="background:#FFF7ED;"><i data-lucide="clock" style="width:15px;color:#F97316;"></i></div>
+        </div>
+        <div class="ssc-value" style="color:var(--blue-800);">3h 40m</div>
+        <div class="ssc-sub">Goal: 4 hours daily</div>
+        <div class="ssc-bar"><div class="ssc-bar-fill" style="width:90%;background:linear-gradient(90deg,#F97316,#FBBF24);"></div></div>
+        <div class="ssc-trend" style="color:#F97316;"><i data-lucide="trending-up" style="width:12px;"></i> 90% of daily goal</div>
+      </div>
+      <!-- Upcoming quiz card -->
+      <div style="background:linear-gradient(135deg,var(--blue-600),var(--blue-900));border-radius:14px;padding:16px;animation:slideLeft 0.8s 1.6s ease forwards;opacity:0;">
+        <div style="font-size:0.65rem;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:var(--blue-300);margin-bottom:10px;">Upcoming Quiz</div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i data-lucide="calendar" style="width:15px;color:white;"></i></div>
+          <div><div style="font-size:0.82rem;font-weight:700;color:white;">OS Quiz — 2:00 PM</div><div style="font-size:0.7rem;color:var(--blue-300);">Operating Systems · 15 questions</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- APP PREVIEW CARD -->
+  <div class="app-preview-wrap reveal">
+    <div class="app-preview">
+      <div class="app-bar">
+        <div class="win-dot" style="background:#FF5F57;"></div>
+        <div class="win-dot" style="background:#FFBD2E;"></div>
+        <div class="win-dot" style="background:#27C840;"></div>
+        <div class="app-url">
+          <i data-lucide="lock" style="width:10px;color:#10B981;"></i>
+          edugenie.app/dashboard
+        </div>
+      </div>
+      <div class="app-body">
+        <!-- Sidebar -->
+        <div class="app-sidebar">
+          <div class="app-nav-section">Main Menu</div>
+          <div class="app-nav active"><i data-lucide="layout-dashboard" style="width:14px;"></i> Workspace</div>
+          <div class="app-nav"><i data-lucide="file-text" style="width:14px;"></i> Library</div>
+          <div class="app-nav"><i data-lucide="activity" style="width:14px;"></i> Progress</div>
+          <div class="app-nav"><i data-lucide="clock" style="width:14px;"></i> History</div>
+          <div class="app-nav"><i data-lucide="award" style="width:14px;"></i> Achievements</div>
+          <div class="app-sidebar-goal">
+            <div style="font-size:0.62rem;font-weight:800;opacity:0.7;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:5px;">Today's Goal</div>
+            <div style="font-size:0.8rem;font-weight:700;">Study 3 topics</div>
+            <div style="height:4px;background:rgba(255,255,255,0.2);border-radius:2px;margin-top:10px;"><div style="width:66%;height:100%;background:white;border-radius:2px;"></div></div>
+            <div style="font-size:0.68rem;color:rgba(255,255,255,0.7);margin-top:6px;">2/3 completed</div>
+          </div>
+        </div>
+        <!-- Main area -->
+        <div class="app-main">
+          <div class="app-main-top">
+            <div class="app-main-title">AI Workspace</div>
+            <div style="font-size:0.72rem;color:var(--text-muted);">Good afternoon, Scholar 👋</div>
+          </div>
+          <div class="tool-row">
+            <div class="tool-chip active">Explain</div>
+            <div class="tool-chip">Q&A</div>
+            <div class="tool-chip">Quiz</div>
+            <div class="tool-chip">Summarize</div>
+            <div class="tool-chip">Roadmap</div>
+          </div>
+          <div class="app-response">
+            <h4>Neural Networks — Explained</h4>
+            A <span class="hl">neural network</span> is a computational system modeled after the human brain. It consists of layers of <span class="hl">interconnected neurons</span> that transform data. Information flows from the <span class="hl">input layer</span> through hidden layers, with each connection having a learnable <span class="hl">weight</span> that is adjusted during training via <span class="hl">backpropagation</span> to minimize prediction error and improve accuracy...
+          </div>
+          <div class="app-input">
+            <i data-lucide="search" style="width:14px;color:var(--blue-400);"></i>
+            <span>Ask EduGenie anything...</span>
+            <div class="send-btn"><i data-lucide="send" style="width:13px;"></i></div>
+          </div>
+        </div>
+        <!-- Right stats panel -->
+        <div class="app-right">
+          <div>
+            <div class="app-right-section">Recent Stats</div>
+            <div class="app-stat-mini">
+              <div class="app-stat-mini-left">
+                <div class="app-stat-mini-icon" style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);"><i data-lucide="flame" style="width:13px;color:#F59E0B;"></i></div>
+                <div class="app-stat-mini-label">Streak</div>
+              </div>
+              <div class="app-stat-mini-val">14 days</div>
+            </div>
+            <div class="app-stat-mini">
+              <div class="app-stat-mini-left">
+                <div class="app-stat-mini-icon" style="background:#ECFDF5;"><i data-lucide="check-circle" style="width:13px;color:#10B981;"></i></div>
+                <div class="app-stat-mini-label">Quiz Avg</div>
+              </div>
+              <div class="app-stat-mini-val">92%</div>
+            </div>
+            <div class="app-stat-mini">
+              <div class="app-stat-mini-left">
+                <div class="app-stat-mini-icon" style="background:var(--blue-50);"><i data-lucide="clock" style="width:13px;color:var(--blue-600);"></i></div>
+                <div class="app-stat-mini-label">Study Time</div>
+              </div>
+              <div class="app-stat-mini-val">3h 40m</div>
+            </div>
+          </div>
+          <div>
+            <div class="app-right-section">Quick Quiz</div>
+            <div class="quiz-item-mini">
+              <div class="quiz-item-mini-q">Largest ocean on Earth?</div>
+              <div class="quiz-opt-mini correct">✓ Pacific Ocean</div>
+              <div class="quiz-opt-mini">Atlantic Ocean</div>
+              <div class="quiz-opt-mini">Indian Ocean</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-band reveal">
+    <div class="stat-item"><div class="stat-val" data-target="10000">0</div><div class="stat-label">Active Learners</div></div>
+    <div class="stat-item"><div class="stat-val" data-target="500000">0</div><div class="stat-label">Questions Answered</div></div>
+    <div class="stat-item"><div class="stat-val" data-target="98">0</div><div class="stat-label">Satisfaction Rate %</div></div>
+    <div class="stat-item"><div class="stat-val" data-target="50">0</div><div class="stat-label">Subjects Covered</div></div>
+  </div>
+
+  <!-- FEATURES -->
+  <section id="features" class="section" style="background:white;border-top:1px solid var(--border-2);">
+    <div class="container">
+      <div class="sec-eyebrow reveal">Features</div>
+      <h2 class="sec-title reveal">Five tools. One workspace.<br>Infinite learning.</h2>
+      <p class="sec-sub reveal">Everything you need to study smarter — built for students, educators, and curious minds.</p>
+      <div class="bento">
+        <div class="bc sp-7 reveal" style="background:linear-gradient(135deg,#EFF6FF,#DBEAFE);">
+          <div class="bc-chip" style="background:#DBEAFE;color:#1D4ED8;"><i data-lucide="message-square" style="width:11px;"></i> Intelligent Q&A</div>
+          <div class="bc-title">Ask anything. Get real answers.</div>
+          <div class="bc-desc">Deep, structured explanations for any academic topic — with context, examples, and full clarity.</div>
+          <div style="display:flex;flex-direction:column;gap:9px;margin-top:20px;">
+            <div class="mini-msg msg-user">What is the difference between TCP and UDP?</div>
+            <div class="mini-msg msg-ai"><strong>TCP</strong> is connection-oriented and guarantees reliable delivery. <strong>UDP</strong> is connectionless and faster — ideal for streaming where speed matters more than reliability.</div>
+          </div>
+        </div>
+        <div class="bc sp-5 reveal" style="background:linear-gradient(135deg,#ECFDF5,#D1FAE5);">
+          <div class="bc-chip" style="background:#D1FAE5;color:#065F46;"><i data-lucide="check-square" style="width:11px;"></i> Generative Quizzes</div>
+          <div class="bc-title">Test yourself. Master faster.</div>
+          <div class="bc-desc">AI-generated quizzes from any topic to reinforce retention and reveal knowledge gaps.</div>
+          <div style="margin-top:18px;">
+            <div style="font-size:0.78rem;font-weight:700;color:var(--text-main);margin-bottom:10px;">Q: Largest ocean on Earth?</div>
+            <div class="q-opt correct"><div class="q-letter">A</div>Pacific Ocean ✓</div>
+            <div class="q-opt"><div class="q-letter">B</div>Atlantic Ocean</div>
+          </div>
+        </div>
+        <div class="bc sp-5 reveal" style="background:linear-gradient(135deg,#EFF6FF,#BFDBFE);">
+          <div class="bc-chip" style="background:#BFDBFE;color:#1E3A8A;"><i data-lucide="activity" style="width:11px;"></i> Progress Tracking</div>
+          <div class="bc-title">Watch yourself grow.</div>
+          <div class="bc-desc">Visual charts and streaks keep you motivated and on track every single day.</div>
+          <div style="margin-top:18px;">
+            <div class="pb-row"><div class="pb-labels"><span>Mathematics</span><span>87%</span></div><div class="pb-track"><div class="pb-fill" style="width:87%;"></div></div></div>
+            <div class="pb-row"><div class="pb-labels"><span>Data Structures</span><span>64%</span></div><div class="pb-track"><div class="pb-fill" style="width:64%;"></div></div></div>
+            <div class="pb-row"><div class="pb-labels"><span>Algorithms</span><span>43%</span></div><div class="pb-track"><div class="pb-fill" style="width:43%;"></div></div></div>
+          </div>
+        </div>
+        <div class="bc sp-7 reveal" style="background:linear-gradient(135deg,#F0F9FF,#BAE6FD);">
+          <div class="bc-chip" style="background:#BAE6FD;color:#075985;"><i data-lucide="align-left" style="width:11px;"></i> Smart Summarizer</div>
+          <div class="bc-title">10,000 words in 10 seconds.</div>
+          <div class="bc-desc">Paste any document and receive a perfectly structured bullet-point summary with key takeaways.</div>
+          <div style="margin-top:20px;background:white;border:1px solid #BAE6FD;border-radius:12px;padding:16px;">
+            <div style="font-size:0.72rem;font-weight:800;color:#075985;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px;">Key Takeaways</div>
+            <div style="display:flex;flex-direction:column;gap:7px;">
+              <div style="display:flex;gap:8px;font-size:0.8rem;color:var(--text-sec);align-items:flex-start;"><span style="color:var(--blue-500);margin-top:2px;">▸</span> Neural networks adjust weights through backpropagation</div>
+              <div style="display:flex;gap:8px;font-size:0.8rem;color:var(--text-sec);align-items:flex-start;"><span style="color:var(--blue-500);margin-top:2px;">▸</span> Deep learning requires large labeled datasets to train</div>
+              <div style="display:flex;gap:8px;font-size:0.8rem;color:var(--text-sec);align-items:flex-start;"><span style="color:var(--blue-500);margin-top:2px;">▸</span> Activation functions introduce non-linearity to models</div>
+            </div>
+          </div>
+        </div>
+        <div class="bc sp-8 reveal" style="background:linear-gradient(135deg,#EEF2FF,#E0E7FF);display:flex;gap:28px;align-items:center;flex-wrap:wrap;">
+          <div style="flex:1;min-width:180px;">
+            <div class="bc-chip" style="background:#E0E7FF;color:#3730A3;"><i data-lucide="map" style="width:11px;"></i> Adaptive Roadmaps</div>
+            <div class="bc-title">From zero to expert.<br>Step by step.</div>
+            <div class="bc-desc">Enter any skill and get a curated learning roadmap with milestones and timelines.</div>
+          </div>
+          <div style="flex:1;min-width:180px;">
+            <div class="rm-step"><div class="rm-num" style="background:var(--blue-800);">1</div><div><div class="rm-title">Fundamentals</div><div class="rm-meta">2 weeks · 8 topics</div></div></div>
+            <div class="rm-step"><div class="rm-num" style="background:var(--blue-600);">2</div><div><div class="rm-title">Core Concepts</div><div class="rm-meta">3 weeks · 14 topics</div></div></div>
+            <div class="rm-step" style="opacity:0.6;"><div class="rm-num" style="background:var(--blue-300);">3</div><div><div class="rm-title">Advanced Topics</div><div class="rm-meta">4 weeks · 20 topics</div></div></div>
+          </div>
+        </div>
+        <div class="bc sp-4 reveal" style="background:linear-gradient(135deg,#F8FAFF,#EFF6FF);">
+          <div class="bc-chip" style="background:var(--blue-50);color:var(--blue-700);"><i data-lucide="file-text" style="width:11px;"></i> Smart Notes</div>
+          <div class="bc-title">Capture. Organize. Revisit.</div>
+          <div class="bc-desc">Save AI responses as notes, organized into folders for future study sessions.</div>
+          <div style="margin-top:18px;display:flex;flex-direction:column;gap:8px;">
+            <div style="background:white;border:1px solid var(--blue-100);border-radius:10px;padding:11px 14px;font-size:0.78rem;"><div style="font-weight:700;color:var(--text-main);">DBMS Fundamentals</div><div style="color:var(--text-muted);font-size:0.7rem;margin-top:2px;">2 hours ago · Databases</div></div>
+            <div style="background:white;border:1px solid var(--blue-100);border-radius:10px;padding:11px 14px;font-size:0.78rem;"><div style="font-weight:700;color:var(--text-main);">Algorithms Summary</div><div style="color:var(--text-muted);font-size:0.7rem;margin-top:2px;">Yesterday · CS</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="how-it-works" class="section" style="background:var(--blue-50);border-top:1px solid var(--blue-100);">
+    <div class="container">
+      <div style="text-align:center;">
+        <div class="sec-eyebrow reveal" style="justify-content:center;">How it Works</div>
+        <h2 class="sec-title reveal" style="text-align:center;">Up and running in 30 seconds.</h2>
+        <p class="sec-sub reveal" style="margin:0 auto;text-align:center;">No setup, no complexity. Just sign up and start learning smarter immediately.</p>
+      </div>
+      <div class="hiw-steps">
+        <div class="hiw-card reveal">
+          <div class="hiw-num">01</div>
+          <div class="hiw-icon" style="background:var(--blue-50);"><i data-lucide="user-plus" style="width:22px;color:var(--blue-600);"></i></div>
+          <div class="hiw-title">Create your account</div>
+          <div class="hiw-desc">Sign up in under 30 seconds — no credit card needed. Your AI learning workspace is ready instantly.</div>
+        </div>
+        <div class="hiw-card reveal" style="transition-delay:0.12s;">
+          <div class="hiw-num">02</div>
+          <div class="hiw-icon" style="background:#EFF6FF;"><i data-lucide="type" style="width:22px;color:var(--blue-700);"></i></div>
+          <div class="hiw-title">Type your topic or question</div>
+          <div class="hiw-desc">Choose any AI tool — Q&A, Quiz, Summarize, or Roadmap — and describe what you want to learn.</div>
+        </div>
+        <div class="hiw-card reveal" style="transition-delay:0.24s;">
+          <div class="hiw-num">03</div>
+          <div class="hiw-icon" style="background:#ECFDF5;"><i data-lucide="graduation-cap" style="width:22px;color:#10B981;"></i></div>
+          <div class="hiw-title">Learn, test, and grow</div>
+          <div class="hiw-desc">Get rich, structured answers instantly. Save notes, take quizzes, and track your progress every day.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section id="testimonials" class="section" style="background:white;border-top:1px solid var(--border-2);">
+    <div class="container">
+      <div style="text-align:center;">
+        <div class="sec-eyebrow reveal" style="justify-content:center;">Testimonials</div>
+        <h2 class="sec-title reveal" style="text-align:center;">Loved by students &amp; educators worldwide.</h2>
+      </div>
+      <div class="testimonial-grid">
+        <div class="tcard reveal">
+          <div class="t-stars">★★★★★</div>
+          <p class="t-quote">"EduGenie completely transformed my study sessions. The AI-generated quizzes are uncannily accurate. I went from a B- to an A in just two months."</p>
+          <div class="t-author"><div class="t-avatar" style="background:linear-gradient(135deg,var(--blue-600),var(--blue-900));">SR</div><div><div class="t-name">Surya Reddy</div><div class="t-role">Computer Science Student</div></div></div>
+        </div>
+        <div class="tcard reveal" style="transition-delay:0.1s;">
+          <div class="t-stars">★★★★★</div>
+          <p class="t-quote">"I use EduGenie to prepare lesson plans and generate quiz sets for my students. It's saved me hours every week and the quality is outstanding."</p>
+          <div class="t-author"><div class="t-avatar" style="background:linear-gradient(135deg,#10B981,#0EA5E9);">PK</div><div><div class="t-name">Prof. Priya Kumar</div><div class="t-role">University Lecturer</div></div></div>
+        </div>
+        <div class="tcard reveal" style="transition-delay:0.2s;">
+          <div class="t-stars">★★★★★</div>
+          <p class="t-quote">"The roadmap feature is incredible. I started with zero Python knowledge and landed my first dev internship in 4 months. Absolutely game-changing."</p>
+          <div class="t-author"><div class="t-avatar" style="background:linear-gradient(135deg,#F97316,#EF4444);">AM</div><div><div class="t-name">Arjun Mehta</div><div class="t-role">Software Engineering Intern</div></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <div class="cta-wrap">
+    <div class="cta-card reveal">
+      <div class="cta-orb cta-orb-1"></div>
+      <div class="cta-orb cta-orb-2"></div>
+      <div class="cta-dot-grid"></div>
+      <div class="cta-inner">
+        <div class="cta-badge"><i data-lucide="sparkles" style="width:12px;"></i> Free forever to start</div>
+        <h2 class="cta-title">Ready to transform<br>the way you learn?</h2>
+        <p class="cta-sub">Join 10,000+ students and educators already using EduGenie to study smarter every day.</p>
+        <div class="cta-actions">
+          <a href="/signup" class="btn-cta-white magnetic">Create Your Free Workspace <i data-lucide="arrow-right" style="width:18px;"></i></a>
+          <a href="/login" class="btn-cta-outline">Sign In <i data-lucide="log-in" style="width:16px;"></i></a>
+        </div>
+        <div class="cta-trust">
+          <div class="cta-trust-item"><i data-lucide="shield-check" style="width:14px;color:#93C5FD;"></i> No credit card required</div>
+          <div class="cta-trust-item"><i data-lucide="clock" style="width:14px;color:#93C5FD;"></i> Ready in 30 seconds</div>
+          <div class="cta-trust-item"><i data-lucide="lock" style="width:14px;color:#93C5FD;"></i> Your data stays private</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-brand"><img src="/static/assets/logo.svg" alt="EduGenie">EduGenie</div>
+    <div class="footer-links">
+      <a href="#features">Features</a>
+      <a href="#how-it-works">How it Works</a>
+      <a href="#testimonials">Reviews</a>
+      <a href="/login">Sign In</a>
+      <a href="/signup">Get Started</a>
+    </div>
+    <div class="footer-copy">© 2026 EduGenie · Built with ❤️ for learners.</div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Navbar
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', window.scrollY > 40));
+
+    // Hero entrance
+    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+    tl.to('#h-badge',  { opacity:1, y:0, duration:0.7, delay:0.3 })
+      .to('#h-title',  { opacity:1, y:0, duration:0.9 }, '-=0.4')
+      .to('#h-sub',    { opacity:1, y:0, duration:0.8 }, '-=0.6')
+      .to('#h-cta',    { opacity:1, y:0, duration:0.7 }, '-=0.55')
+      .to('#h-trust',  { opacity:1, y:0, duration:0.7 }, '-=0.5')
+      .to('#h-demo',   { opacity:1, y:0, duration:0.8 }, '-=0.4');
+
+    // Scroll reveals
+    gsap.utils.toArray('.reveal').forEach(el => {
+      gsap.fromTo(el, { opacity:0, y:30 }, {
+        opacity:1, y:0, duration:0.85, ease:'power3.out',
+        scrollTrigger:{ trigger:el, start:'top 88%', toggleActions:'play none none none' }
+      });
+    });
+
+    // Magnetic buttons
+    document.querySelectorAll('.magnetic').forEach(btn => {
+      btn.addEventListener('mousemove', e => {
+        const r = btn.getBoundingClientRect();
+        gsap.to(btn, { x:(e.clientX - r.left - r.width/2)*0.22, y:(e.clientY - r.top - r.height/2)*0.22, duration:0.4, ease:'power2.out' });
+      });
+      btn.addEventListener('mouseleave', () => gsap.to(btn, { x:0, y:0, duration:0.7, ease:'elastic.out(1,0.3)' }));
+    });
+
+    // Stat counters
+    ScrollTrigger.create({
+      trigger:'.stats-band', start:'top 85%', once:true,
+      onEnter:() => {
+        document.querySelectorAll('.stat-val[data-target]').forEach(el => {
+          const t = +el.dataset.target;
+          gsap.fromTo({ v:0 }, { v:t }, {
+            duration:2, ease:'power2.out',
+            onUpdate: function() {
+              const v = Math.round(this.targets()[0].v);
+              el.textContent = t >= 100000 ? (v/1000).toFixed(0)+'K+' : t >= 1000 ? (v/1000).toFixed(0)+'K+' : v + (t===98?'%':t===50?'+':'');
+            }
+          });
+        });
+      }
+    });
+
+    // Progress bars animate on scroll
+    ScrollTrigger.create({
+      trigger:'.bento', start:'top 80%', once:true,
+      onEnter:() => {
+        document.querySelectorAll('.pb-fill').forEach(el => {
+          const w = el.style.width; el.style.width = '0';
+          gsap.to(el, { width:w, duration:1.5, ease:'power3.out', delay:0.4 });
+        });
+        document.querySelectorAll('.ssc-bar-fill').forEach(el => {
+          const w = el.style.width; el.style.width = '0';
+          gsap.to(el, { width:w, duration:1.2, ease:'power3.out', delay:0.2 });
+        });
+      }
+    });
+  </script>
+</body>
+</html>

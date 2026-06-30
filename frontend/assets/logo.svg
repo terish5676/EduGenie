@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <!-- 
+    EduGenie Brand Logo (2026)
+    Abstract geometric representation of connection, growth, and nodes of knowledge.
+  -->
+  
+  <defs>
+    <linearGradient id="primaryGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#5B8DFF" />
+      <stop offset="100%" stop-color="#3B82F6" />
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#8EC5FF" />
+      <stop offset="100%" stop-color="#5B8DFF" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="4" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Base Grid / Structure (Invisible) -->
+  <g transform="translate(50, 50) rotate(-15)">
+    <!-- Central Node (Knowledge Base) -->
+    <circle cx="0" cy="0" r="14" fill="url(#primaryGrad)" filter="url(#glow)"/>
+    
+    <!-- Outer Node 1 (Discovery) -->
+    <circle cx="-24" cy="-24" r="8" fill="url(#accentGrad)"/>
+    <!-- Outer Node 2 (Growth) -->
+    <circle cx="28" cy="-12" r="10" fill="url(#accentGrad)"/>
+    <!-- Outer Node 3 (Synthesis) -->
+    <circle cx="-12" cy="28" r="6" fill="url(#accentGrad)"/>
+    
+    <!-- Connecting Paths (Neural/Socratic Flow) -->
+    <path d="M-8,-8 L-18,-18" stroke="#5B8DFF" stroke-width="4" stroke-linecap="round"/>
+    <path d="M12,-4 L20,-8" stroke="#5B8DFF" stroke-width="3" stroke-linecap="round"/>
+    <path d="M-4,12 L-8,22" stroke="#5B8DFF" stroke-width="3" stroke-linecap="round"/>
+    
+    <!-- Orbital Rings (Continuous Learning) -->
+    <circle cx="0" cy="0" r="34" stroke="#E4EEFF" stroke-width="2" stroke-dasharray="10 6"/>
+  </g>
+</svg>

@@ -1,0 +1,3 @@
+"""
+EduGenie — Backend utilities init
+"""

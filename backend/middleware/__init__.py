@@ -1,0 +1,3 @@
+"""
+EduGenie — Backend middleware init
+"""
