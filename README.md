@@ -2,7 +2,6 @@
 
 > A production-ready, full-stack educational platform powered by FastAPI, Google Gemini AI, and MongoDB.
 
-![EduGenie](frontend/assets/genie-hero.png)
 
 ---
 
