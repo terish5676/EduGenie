@@ -138,21 +138,15 @@ The project combines modern backend technologies with Google's Gemini AI to deli
 
 # Screenshots
 
-> Screenshots will be added after deployment.
+## Landing Page
 
-| Landing Page | Dashboard   |
-| ------------ | ----------- |
-| Coming Soon  | Coming Soon |
+<img width="1536" height="737" alt="image" src="https://github.com/user-attachments/assets/5251223e-2ad9-4b3c-a70f-c2b846d24a43" />
 
-| Notes       | Progress    |
-| ----------- | ----------- |
-| Coming Soon | Coming Soon |
 
-| Quiz Generator | Learning Roadmap |
-| -------------- | ---------------- |
-| Coming Soon    | Coming Soon      |
+## Dashboard
 
----
+<img width="1536" height="731" alt="image" src="https://github.com/user-attachments/assets/6340ba62-b490-495f-ab61-b9e4f67ee5b3" />
+
 
 # Project Structure
 
