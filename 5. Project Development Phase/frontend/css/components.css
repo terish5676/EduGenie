@@ -244,7 +244,7 @@
   display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;
 }
 .activity-dot {
-  width: 100%; aspect-ratio: 1;
+  width: 100%; aspect-ratio: 1; min-height: 20px;
   border-radius: 4px;
   background: var(--border);
   transition: all var(--transition);

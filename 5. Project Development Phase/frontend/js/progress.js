@@ -2,6 +2,10 @@
  * EduGenie — Progress Page JavaScript
  * Utilizing Chart.js for beautiful, accurate analytics
  */
+/**
+ * EduGenie — Progress Page JavaScript
+ * Utilizing Chart.js for beautiful, accurate analytics
+ */
 import api from './api.js';
 import { showToast, initTheme, requireAuth, initSidebar, initNotifications } from './main.js';
 
@@ -12,8 +16,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   initNotifications();
   await loadProgress();
 });
-
-
 
 async function loadProgress() {
   try {
@@ -84,4 +86,65 @@ function renderActivityGrid(activity) {
 
 function renderBeautifulCharts(dailyActivity, quizScores) {
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const textColor = isDark ? '#f1f5f9' : '#1e293b';
+  const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
+  const primaryColor = '#6366f1';
+
+  // Activity Chart
+  const ctxActivity = document.getElementById('activity-chart');
+  if (ctxActivity) {
+    new Chart(ctxActivity, {
+      type: 'line',
+      data: {
+        labels: dailyActivity.map(d => {
+          const date = new Date(d.date);
+          return `${date.getMonth() + 1}/${date.getDate()}`;
+        }),
+        datasets: [{
+          label: 'Sessions',
+          data: dailyActivity.map(d => d.sessions),
+          borderColor: primaryColor,
+          backgroundColor: `${primaryColor}33`,
+          borderWidth: 2,
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { ticks: { color: textColor }, grid: { display: false } },
+          y: { ticks: { color: textColor, stepSize: 1 }, grid: { color: gridColor } }
+        }
+      }
+    });
+  }
+
+  // Quiz Performance Chart
+  const ctxQuiz = document.getElementById('quiz-chart');
+  if (ctxQuiz) {
+    new Chart(ctxQuiz, {
+      type: 'bar',
+      data: {
+        labels: quizScores.map((_, i) => `Quiz ${i + 1}`),
+        datasets: [{
+          label: 'Score',
+          data: quizScores,
+          backgroundColor: '#10B981',
+          borderRadius: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { ticks: { color: textColor, display: false }, grid: { display: false } },
+          y: { min: 0, max: 100, ticks: { color: textColor }, grid: { color: gridColor } }
+        }
+      }
+    });
+  }
 }

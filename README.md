@@ -161,39 +161,56 @@ EduGenieNEW/
 │   ├── middleware/
 │   │   └── auth_middleware.py
 │   │
+│   ├── models/
+│   │
 │   ├── routers/
-│   │   ├── auth.py
 │   │   ├── ai.py
-│   │   ├── notes.py
+│   │   ├── auth.py
 │   │   ├── bookmarks.py
 │   │   ├── history.py
+│   │   ├── notes.py
 │   │   ├── progress.py
 │   │   └── settings.py
 │   │
+│   ├── schemas/
+│   │   └── schemas.py
+│   │
 │   ├── services/
-│   │   ├── gemini_service.py
 │   │   ├── auth_service.py
-│   │   └── file_service.py
+│   │   ├── file_service.py
+│   │   └── gemini_service.py
 │   │
 │   └── utils/
 │       ├── jwt_handler.py
 │       └── prompts.py
 │
 ├── frontend/
+│   ├── achievements.html
+│   ├── bookmarks.html
+│   ├── dashboard.html
+│   ├── forgot-password.html
+│   ├── history.html
 │   ├── index.html
 │   ├── login.html
-│   ├── signup.html
-│   ├── forgot-password.html
-│   ├── dashboard.html
 │   ├── notes.html
-│   ├── bookmarks.html
 │   ├── progress.html
-│   ├── history.html
 │   ├── settings.html
+│   ├── signup.html
 │   │
+│   ├── assets/
 │   ├── css/
-│   ├── js/
-│   └── assets/
+│   └── js/
+│       ├── achievements.js
+│       ├── api.js
+│       ├── auth.js
+│       ├── bookmarks.js
+│       ├── dashboard.js
+│       ├── history.js
+│       ├── landing.js
+│       ├── main.js
+│       ├── notes.js
+│       ├── progress.js
+│       └── settings.js
 │
 ├── uploads/
 ├── .env.example
